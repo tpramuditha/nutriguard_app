@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'theme/app_theme.dart';
+import 'routes/app_routes.dart';
+import 'routes/route_names.dart';
 
 class NutriGuardApp extends StatelessWidget {
   const NutriGuardApp({super.key});
@@ -13,7 +15,8 @@ class NutriGuardApp extends StatelessWidget {
 
       theme: AppTheme.lightTheme,
 
-      home: const Scaffold(body: Center(child: Text('NutriGuard'))),
+      initialRoute: RouteNames.welcome,
+      onGenerateRoute: AppRoutes.generateRoute,
     );
   }
 }
