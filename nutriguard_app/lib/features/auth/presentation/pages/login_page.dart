@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/routes/route_names.dart';
 import '../widgets/auth_header.dart';
 import '../widgets/auth_text_field.dart';
+import '../../../../core/services/firebase/firebase_auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,6 +18,9 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final FirebaseAuthService _authService = FirebaseAuthService();
+
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -24,12 +29,76 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _login() {
-    if (!_formKey.currentState!.validate()) return;
+  Future<void> _login() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Firebase login will be added next.')),
-    );
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your email and password.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _authService.signIn(email: email, password: password);
+
+      if (!mounted) return;
+
+      // Login successful - navigate to Dashboard
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        RouteNames.dashboard,
+        (route) => false,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+
+      String message;
+
+      switch (e.code) {
+        case 'email-not-verified':
+          message = 'Please verify your email before logging in.';
+          break;
+        case 'invalid-credential':
+        case 'wrong-password':
+        case 'user-not-found':
+          message = 'Incorrect email or password.';
+          break;
+        case 'invalid-email':
+          message = 'Please enter a valid email address.';
+          break;
+        case 'too-many-requests':
+          message = 'Too many attempts. Please try again later.';
+          break;
+        case 'network-request-failed':
+          message = 'Please check your internet connection.';
+          break;
+        default:
+          message = 'Login failed. Please try again.';
+      }
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Something went wrong. Please try again.'),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -86,8 +155,17 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(
                   height: 52,
                   child: ElevatedButton(
-                    onPressed: _login,
-                    child: const Text('Log In'),
+                    onPressed: _isLoading ? null : _login,
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text('Log In'),
                   ),
                 ),
 

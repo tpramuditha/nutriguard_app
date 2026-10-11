@@ -1,12 +1,20 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nutriguard_app/app/app.dart';
+
+import 'package:nutriguard_app/features/auth/presentation/pages/welcome_page.dart';
 
 void main() {
-  testWidgets('NutriGuard app loads successfully', (WidgetTester tester) async {
-    // Build the NutriGuard application.
-    await tester.pumpWidget(const NutriGuardApp());
+  testWidgets('NutriGuard welcome page loads successfully', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(home: Scaffold(body: WelcomePage())),
+    );
 
-    // Verify that the NutriGuard text is displayed.
+    // Check that the first onboarding slide is displayed.
     expect(find.text('NutriGuard'), findsOneWidget);
+
+    // Check the first onboarding button.
+    expect(find.text('Get Started'), findsOneWidget);
   });
 }

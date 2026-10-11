@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../../../core/services/firebase/firebase_auth_service.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/routes/route_names.dart';
 import '../widgets/auth_header.dart';
@@ -17,8 +19,10 @@ class _SignupPageState extends State<SignupPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final FirebaseAuthService _authService = FirebaseAuthService();
 
   bool _agreeToTerms = false;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -34,12 +38,13 @@ class _SignupPageState extends State<SignupPage> {
         .showSnackBar(SnackBar(content: Text(message)));
   }
 
-  void _signup() {
+  Future<void> _signup() async {
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
 
+    // Check empty fields
     if (name.isEmpty ||
         email.isEmpty ||
         password.isEmpty ||
@@ -48,27 +53,82 @@ class _SignupPageState extends State<SignupPage> {
       return;
     }
 
+    // Check email format
     if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email)) {
       _showMessage('Please enter a valid email address.');
       return;
     }
 
+    // Check password length
     if (password.length < 8) {
       _showMessage('Password must have at least 8 characters.');
       return;
     }
 
+    // Check matching passwords
     if (password != confirmPassword) {
       _showMessage('Passwords do not match.');
       return;
     }
 
+    // Check terms checkbox
     if (!_agreeToTerms) {
       _showMessage('Please agree to the Terms & Privacy Policy.');
       return;
     }
 
-    _showMessage('Firebase signup will be added next.');
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Create Firebase account
+      await _authService.signUp(name: name, email: email, password: password);
+
+      if (!mounted) return;
+
+      _showMessage(
+        'Account created! Please check your email to verify your account.',
+      );
+
+      // Navigate to Login
+      Navigator.pushReplacementNamed(context, RouteNames.login);
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+
+      String message;
+
+      switch (e.code) {
+        case 'email-already-in-use':
+          message = 'This email is already registered.';
+          break;
+        case 'weak-password':
+          message = 'Please choose a stronger password.';
+          break;
+        case 'invalid-email':
+          message = 'Please enter a valid email address.';
+          break;
+        case 'network-request-failed':
+          message = 'Network error. Check your internet connection.';
+          break;
+        default:
+          message = 'Signup failed. Please try again.';
+      }
+
+      _showMessage(message);
+    } catch (e) {
+      if (!mounted) return;
+
+      _showMessage(
+        'Could not finish registration. Check your email or try signing in.',
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   Widget _socialButton(String label) {
@@ -168,8 +228,17 @@ class _SignupPageState extends State<SignupPage> {
               SizedBox(
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: _signup,
-                  child: const Text('Create Account'),
+                  onPressed: _isLoading ? null : _signup,
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('Create Account'),
                 ),
               ),
 

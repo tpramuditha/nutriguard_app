@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../features/auth/presentation/pages/welcome_page.dart';
+import '../../features/auth/presentation/pages/auth_gate.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/signup_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
@@ -10,7 +10,7 @@ class AppRoutes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case RouteNames.welcome:
-        return MaterialPageRoute(builder: (_) => const WelcomePage());
+        return MaterialPageRoute(builder: (_) => const AuthGate());
 
       case RouteNames.login:
         return MaterialPageRoute(builder: (_) => const LoginPage());
