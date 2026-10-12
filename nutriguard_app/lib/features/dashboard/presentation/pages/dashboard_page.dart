@@ -3,6 +3,13 @@ import 'package:flutter/material.dart';
 import '../../../../app/routes/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/services/firebase/firebase_auth_service.dart';
+import '../../../../shared/widgets/bottom_nav_bar.dart';
+
+import '../widgets/macro_chart.dart';
+import '../widgets/quick_actions.dart';
+import '../widgets/dashboard_header.dart';
+import '../widgets/calorie_progress_card.dart';
+import '../widgets/today_meals_card.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -46,40 +53,92 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  void _onBottomNavTap(int index) {
+    if (index == 0) {
+      // Home is already selected.
+      return;
+    }
+
+    const pages = ['Home', 'Scanner', 'Planner', 'Progress', 'Profile'];
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${pages[index]} page is coming soon.'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5FAFC),
+
       appBar: AppBar(
-        title: const Text('NutriGuard'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        title: const Text(
+          'NutriGuard',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.primary,
+          ),
+        ),
+        backgroundColor: const Color(0xFFF5FAFC),
+
+        actions: [
+          PopupMenuButton<String>(
+            enabled: !_isLoggingOut,
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) {
+              if (value == 'logout') {
+                _logout();
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: 'logout', child: Text('Log Out')),
+            ],
+          ),
+        ],
       ),
-      body: Center(
+
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.check_circle, color: AppColors.primary, size: 70),
+            // Header with Firebase username
+            const DashboardHeader(),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-            const Text(
-              'Welcome to NutriGuard!',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            // Sample values for UI development
+            const CalorieProgressCard(
+              consumedCalories: 1450,
+              targetCalories: 2000,
+              burnedCalories: 120,
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 24),
 
-            const Text('You are successfully logged in.'),
+            // Macronutrient progress
+            const MacroChart(),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 28),
 
-            ElevatedButton.icon(
-              onPressed: _isLoggingOut ? null : _logout,
-              icon: const Icon(Icons.logout),
-              label: Text(_isLoggingOut ? 'Logging out...' : 'Log Out'),
-            ),
+            // Quick access to main features
+            const QuickActions(),
+
+            const SizedBox(height: 24),
+
+            // Today's Meals
+            const TodayMealsCard(),
+
+            const SizedBox(height: 24),
           ],
         ),
+      ),
+
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: 0,
+        onTap: _onBottomNavTap,
       ),
     );
   }
