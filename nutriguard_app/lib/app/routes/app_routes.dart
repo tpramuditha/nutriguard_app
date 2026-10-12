@@ -5,6 +5,7 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/signup_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/meals/presentation/pages/meal_recommendation_page.dart';
+import '../../features/profile/presentation/pages/profile_page.dart';
 import 'route_names.dart';
 
 class AppRoutes {
@@ -26,6 +27,9 @@ class AppRoutes {
         return MaterialPageRoute(
           builder: (_) => const MealRecommendationPage(),
         );
+
+      case RouteNames.profile:
+        return MaterialPageRoute(builder: (_) => const ProfilePage());
 
       default:
         return MaterialPageRoute(

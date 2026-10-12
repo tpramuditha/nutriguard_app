@@ -55,11 +55,18 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   void _onBottomNavTap(int index) {
+    // Index 0 = Home
     if (index == 0) {
-      // Home is already selected.
       return;
     }
 
+    // Index 4 = Profile
+    if (index == 4) {
+      Navigator.pushNamed(context, RouteNames.profile);
+      return;
+    }
+
+    // Other pages are not implemented yet
     const pages = ['Home', 'Scanner', 'Planner', 'Progress', 'Profile'];
 
     ScaffoldMessenger.of(context).showSnackBar(
