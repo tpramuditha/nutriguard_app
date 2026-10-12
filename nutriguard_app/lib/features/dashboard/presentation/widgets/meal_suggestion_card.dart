@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/routes/route_names.dart';
 
 class MealSuggestionCard extends StatelessWidget {
   const MealSuggestionCard({super.key});
@@ -78,11 +79,7 @@ class MealSuggestionCard extends StatelessWidget {
             alignment: Alignment.centerRight,
             child: TextButton.icon(
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Meal Recommendations page coming soon'),
-                  ),
-                );
+                Navigator.pushNamed(context, RouteNames.mealRecommendation);
               },
               label: const Text('View Details'),
               icon: const Icon(Icons.arrow_forward, size: 18),
