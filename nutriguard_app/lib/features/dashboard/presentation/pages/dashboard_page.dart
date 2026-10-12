@@ -4,6 +4,7 @@ import '../../../../app/routes/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/services/firebase/firebase_auth_service.dart';
 import '../../../../shared/widgets/bottom_nav_bar.dart';
+import '../../../profile/presentation/widgets/logout_dialog.dart';
 
 import '../widgets/macro_chart.dart';
 import '../widgets/quick_actions.dart';
@@ -69,6 +70,19 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
+  Future<void> _confirmLogout() async {
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => const LogoutDialog(),
+    );
+
+    if (!mounted) return;
+
+    if (shouldLogout == true) {
+      await _logout();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,7 +104,7 @@ class _DashboardPageState extends State<DashboardPage> {
             icon: const Icon(Icons.more_vert),
             onSelected: (value) {
               if (value == 'logout') {
-                _logout();
+                _confirmLogout();
               }
             },
             itemBuilder: (context) => [
