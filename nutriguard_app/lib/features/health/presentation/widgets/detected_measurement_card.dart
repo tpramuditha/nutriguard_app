@@ -73,7 +73,7 @@ class DetectedMeasurementCard extends StatelessWidget {
                 SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    'Low confidence — please verify',
+                    'Unverified OCR result — check against report',
                     style: TextStyle(color: Colors.deepOrange, fontSize: 12),
                   ),
                 ),

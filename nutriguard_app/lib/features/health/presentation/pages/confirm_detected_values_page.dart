@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../widgets/detected_measurement_card.dart';
+import '../../data/models/health_measurement_model.dart';
 
 class ConfirmDetectedValuesPage extends StatefulWidget {
-  const ConfirmDetectedValuesPage({super.key});
+  final List<HealthMeasurementModel>? detectedMeasurements;
+
+  const ConfirmDetectedValuesPage({super.key, this.detectedMeasurements});
 
   @override
   State<ConfirmDetectedValuesPage> createState() =>
@@ -12,35 +15,72 @@ class ConfirmDetectedValuesPage extends StatefulWidget {
 }
 
 class _ConfirmDetectedValuesPageState extends State<ConfirmDetectedValuesPage> {
-  final List<Map<String, dynamic>> _measurements = [
-    {
-      'title': 'Cholesterol',
-      'value': '220',
-      'unit': 'mg/dL',
-      'icon': Icons.water_drop,
-      'color': Colors.deepOrange,
-      'lowConfidence': true,
-      'confirmed': false,
-    },
-    {
-      'title': 'Blood Sugar',
-      'value': '95',
-      'unit': 'mg/dL',
-      'icon': Icons.water_drop_outlined,
-      'color': Colors.blue,
-      'lowConfidence': false,
-      'confirmed': false,
-    },
-    {
-      'title': 'Blood Pressure',
-      'value': '120/80',
-      'unit': 'mmHg',
-      'icon': Icons.favorite,
-      'color': Colors.pink,
-      'lowConfidence': false,
-      'confirmed': false,
-    },
-  ];
+  late final List<Map<String, dynamic>> _measurements;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final detected = widget.detectedMeasurements;
+
+    if (detected != null) {
+      // Use actual OCR candidates when they are provided.
+      _measurements = detected.map((measurement) {
+        Color color = Colors.blue;
+        IconData icon = Icons.science_outlined;
+
+        if (measurement.name.toLowerCase().contains('cholesterol') ||
+            measurement.name.toLowerCase().contains('triglycerides')) {
+          color = Colors.deepOrange;
+          icon = Icons.water_drop;
+        } else if (measurement.name.toLowerCase().contains('glucose')) {
+          color = Colors.blue;
+          icon = Icons.water_drop_outlined;
+        }
+
+        return <String, dynamic>{
+          'title': measurement.name,
+          'value': measurement.value.toString(),
+          'unit': measurement.unit,
+          'icon': icon,
+          'color': color,
+          'lowConfidence': true,
+          'confirmed': false,
+        };
+      }).toList();
+    } else {
+      // Temporary demo data for the existing preview route.
+      _measurements = [
+        {
+          'title': 'Cholesterol',
+          'value': '220',
+          'unit': 'mg/dL',
+          'icon': Icons.water_drop,
+          'color': Colors.deepOrange,
+          'lowConfidence': true,
+          'confirmed': false,
+        },
+        {
+          'title': 'Blood Sugar',
+          'value': '95',
+          'unit': 'mg/dL',
+          'icon': Icons.water_drop_outlined,
+          'color': Colors.blue,
+          'lowConfidence': false,
+          'confirmed': false,
+        },
+        {
+          'title': 'Blood Pressure',
+          'value': '120/80',
+          'unit': 'mmHg',
+          'icon': Icons.favorite,
+          'color': Colors.pink,
+          'lowConfidence': false,
+          'confirmed': false,
+        },
+      ];
+    }
+  }
 
   bool get _allConfirmed =>
       _measurements.every((measurement) => measurement['confirmed'] == true);
@@ -141,14 +181,17 @@ class _ConfirmDetectedValuesPageState extends State<ConfirmDetectedValuesPage> {
                   color: const Color(0xFFE7F4FF),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Row(
+
+                child: Row(
                   children: [
-                    Icon(Icons.description_outlined, color: Colors.blue),
-                    SizedBox(width: 12),
+                    const Icon(Icons.description_outlined, color: Colors.blue),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Demo scan results. Please review each '
-                        'value before confirming.',
+                        widget.detectedMeasurements == null
+                            ? 'Demo values for UI testing. Nothing will be saved.'
+                            : 'Measurements extracted from your report. '
+                                  'Verify every name, value, and unit before confirming.',
                       ),
                     ),
                   ],
