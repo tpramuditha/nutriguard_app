@@ -10,6 +10,7 @@ import '../../features/health/presentation/pages/health_profile_page.dart';
 import '../../features/health/presentation/pages/log_health_marker_page.dart';
 import '../../features/health/presentation/pages/add_health_report_page.dart';
 import '../../features/health/presentation/pages/confirm_detected_values_page.dart';
+import '../../features/health/presentation/pages/scan_health_report_page.dart';
 import 'route_names.dart';
 
 class AppRoutes {
@@ -48,6 +49,9 @@ class AppRoutes {
         return MaterialPageRoute(
           builder: (_) => const ConfirmDetectedValuesPage(),
         );
+
+      case RouteNames.scanHealthReport:
+        return MaterialPageRoute(builder: (_) => const ScanHealthReportPage());
 
       default:
         return MaterialPageRoute(

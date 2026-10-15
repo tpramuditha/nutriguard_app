@@ -278,7 +278,7 @@ class _HealthProfilePageState extends State<HealthProfilePage> {
 
             OutlinedButton.icon(
               onPressed: () {
-                Navigator.pushNamed(context, RouteNames.confirmDetectedValues);
+                Navigator.pushNamed(context, RouteNames.scanHealthReport);
               },
               icon: const Icon(Icons.document_scanner_outlined),
               label: const Text('Scan Blood Report (Auto-fill)'),
