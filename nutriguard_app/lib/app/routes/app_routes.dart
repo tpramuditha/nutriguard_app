@@ -6,6 +6,10 @@ import '../../features/auth/presentation/pages/signup_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/meals/presentation/pages/meal_recommendation_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/health/presentation/pages/health_profile_page.dart';
+import '../../features/health/presentation/pages/log_health_marker_page.dart';
+import '../../features/health/presentation/pages/add_health_report_page.dart';
+import '../../features/health/presentation/pages/confirm_detected_values_page.dart';
 import 'route_names.dart';
 
 class AppRoutes {
@@ -30,6 +34,20 @@ class AppRoutes {
 
       case RouteNames.profile:
         return MaterialPageRoute(builder: (_) => const ProfilePage());
+
+      case RouteNames.health:
+        return MaterialPageRoute(builder: (_) => const HealthProfilePage());
+
+      case RouteNames.logHealthMarker:
+        return MaterialPageRoute(builder: (_) => const LogHealthMarkerPage());
+
+      case RouteNames.addHealthReport:
+        return MaterialPageRoute(builder: (_) => const AddHealthReportPage());
+
+      case RouteNames.confirmDetectedValues:
+        return MaterialPageRoute(
+          builder: (_) => const ConfirmDetectedValuesPage(),
+        );
 
       default:
         return MaterialPageRoute(

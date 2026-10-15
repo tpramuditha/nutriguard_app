@@ -13,4 +13,7 @@ class RouteNames {
   static const String exercise = '/exercise';
   static const String progress = '/progress';
   static const String profile = '/profile';
+  static const String logHealthMarker = '/log-health-marker';
+  static const String addHealthReport = '/add-health-report';
+  static const String confirmDetectedValues = '/confirm-detected-values';
 }
