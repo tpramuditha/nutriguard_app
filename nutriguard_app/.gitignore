@@ -46,3 +46,17 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+
+# Firebase testing dependencies
+firestore-tests/node_modules/
+
+# Firebase emulator files
+*-debug.log
+*-debug.log.*
+.firebase/
+firestore_export/
+
+# Local environment files
+.env
+.env.*
