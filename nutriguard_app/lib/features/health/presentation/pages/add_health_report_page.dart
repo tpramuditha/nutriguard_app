@@ -5,6 +5,7 @@ import '../widgets/report_measurement_fields.dart';
 import '../widgets/custom_measurement_fields.dart';
 import '../../data/models/health_measurement_model.dart';
 import '../../data/models/health_report_model.dart';
+import '../../data/repositories/health_report_repository.dart';
 
 class AddHealthReportPage extends StatefulWidget {
   const AddHealthReportPage({super.key});
@@ -19,6 +20,12 @@ class _AddHealthReportPageState extends State<AddHealthReportPage> {
   String _customReportName = '';
 
   List<Map<String, String>> _customMeasurements = [];
+
+  // Repository used to communicate with Cloud Firestore.
+  final HealthReportRepository _reportRepository = HealthReportRepository();
+
+  // Tracks whether a report is currently being saved.
+  bool _isSaving = false;
 
   DateTime _reportDate = DateTime.now();
 
@@ -66,7 +73,45 @@ class _AddHealthReportPageState extends State<AddHealthReportPage> {
     }
   }
 
+  Future<void> _saveConfirmedReport(HealthReportModel report) async {
+    if (_isSaving) return;
+
+    if (mounted) {
+      setState(() {
+        _isSaving = false;
+      });
+    }
+
+    try {
+      await _reportRepository.saveReport(report);
+
+      if (!mounted) return;
+
+      // Return to Health Profile after saving successfully.
+      Navigator.pop(context, true);
+    } catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Unable to save the report. '
+            'Check your connection and try again.',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
+    }
+  }
+
   Future<void> _validateAndConfirm() async {
+    if (_isSaving) return;
+
     String reportName;
 
     final List<HealthMeasurementModel> measurements = [];
@@ -155,6 +200,15 @@ class _AddHealthReportPageState extends State<AddHealthReportPage> {
       return;
     }
 
+    if (measurements.length > 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('A report can contain a maximum of 10 measurements.'),
+        ),
+      );
+      return;
+    }
+
     // Create the complete Health Report object.
     final report = HealthReportModel(
       reportType: _selectedReport,
@@ -186,16 +240,27 @@ class _AddHealthReportPageState extends State<AddHealthReportPage> {
               'Type: ${report.reportType}\n'
               'Date: $_formattedReportDate\n\n'
               '$measurementSummary\n\n'
-              'Preview only. This report has not '
-              'been saved to Firebase.',
+              'Please verify every measurement and its unit '
+              'against your original laboratory report before saving.',
             ),
           ),
+
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
               },
-              child: const Text('Close'),
+              child: const Text('Cancel'),
+            ),
+
+            ElevatedButton.icon(
+              onPressed: () async {
+                Navigator.pop(dialogContext);
+
+                await _saveConfirmedReport(report);
+              },
+              icon: const Icon(Icons.save_outlined),
+              label: const Text('Confirm & Save'),
             ),
           ],
         );
@@ -394,7 +459,7 @@ class _AddHealthReportPageState extends State<AddHealthReportPage> {
             const SizedBox(height: 20),
 
             ElevatedButton.icon(
-              onPressed: _validateAndConfirm,
+              onPressed: _isSaving ? null : _validateAndConfirm,
               icon: const Icon(Icons.fact_check_outlined),
               label: const Text('Review Report Details'),
             ),

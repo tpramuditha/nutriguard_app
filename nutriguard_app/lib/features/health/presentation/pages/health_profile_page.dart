@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../widgets/health_marker_card.dart';
 import '../../../../app/routes/route_names.dart';
+import '../../data/repositories/health_report_repository.dart';
+import '../widgets/health_report_card.dart';
+import 'health_report_detail_page.dart';
+import '../../data/models/health_report_model.dart';
 
 class HealthProfilePage extends StatefulWidget {
   const HealthProfilePage({super.key});
@@ -12,6 +16,9 @@ class HealthProfilePage extends StatefulWidget {
 }
 
 class _HealthProfilePageState extends State<HealthProfilePage> {
+  final HealthReportRepository _reportRepository = HealthReportRepository();
+
+  late Future<List<HealthReportModel>> _reportsFuture;
   // Start with the current month.
   DateTime _selectedMonth = DateTime(DateTime.now().year, DateTime.now().month);
 
@@ -47,6 +54,18 @@ class _HealthProfilePageState extends State<HealthProfilePage> {
   void _showComingSoon(String feature) {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text('$feature will be added next.')));
+  }
+
+  void _refreshHealthReports() {
+    setState(() {
+      _reportsFuture = _reportRepository.getReports();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _reportsFuture = _reportRepository.getReports();
   }
 
   @override
@@ -207,50 +226,99 @@ class _HealthProfilePageState extends State<HealthProfilePage> {
 
             const SizedBox(height: 12),
 
-            // Empty state - no additional reports saved yet
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: const Color(0xFFE0EFF2)),
-              ),
-              child: const Column(
-                children: [
-                  Icon(
-                    Icons.folder_open_outlined,
-                    color: AppColors.textSecondary,
-                    size: 38,
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'No additional health reports yet',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+            //additional reports saved
+            FutureBuilder(
+              future: _reportsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(24),
+                      child: CircularProgressIndicator(),
                     ),
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    'Add a laboratory report to track more '
-                    'health measurements.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textSecondary,
+                  );
+                }
+
+                if (snapshot.hasError) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text(
+                      'Unable to load health reports. Please try again.',
+                      style: TextStyle(color: Colors.red),
                     ),
-                  ),
-                ],
-              ),
+                  );
+                }
+
+                final reports = snapshot.data ?? [];
+
+                if (reports.isEmpty) {
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: const Color(0xFFE0EFF2)),
+                    ),
+                    child: const Column(
+                      children: [
+                        Icon(
+                          Icons.folder_open_outlined,
+                          color: AppColors.textSecondary,
+                          size: 38,
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          'No additional health reports yet',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          'Add a laboratory report to track more health measurements.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return Column(
+                  children: reports.map((report) {
+                    return HealthReportCard(
+                      report: report,
+
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                HealthReportDetailPage(report: report),
+                          ),
+                        );
+                      },
+                    );
+                  }).toList(),
+                );
+              },
             ),
 
             const SizedBox(height: 14),
 
             // Add Health Report button
             OutlinedButton.icon(
-              onPressed: () {
-                Navigator.pushNamed(context, RouteNames.addHealthReport);
+              onPressed: () async {
+                await Navigator.pushNamed(context, RouteNames.addHealthReport);
+
+                if (!mounted) return;
+
+                _refreshHealthReports();
               },
               icon: const Icon(Icons.add_circle_outline),
               label: const Text('Add Health Report'),
