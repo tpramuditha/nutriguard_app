@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../data/models/health_measurement_model.dart';
+import '../../data/models/monthly_health_marker_model.dart';
+import '../../data/repositories/monthly_health_marker_repository.dart';
 
 class LogHealthMarkerPage extends StatefulWidget {
-  const LogHealthMarkerPage({super.key});
+  final DateTime? selectedMonth;
+
+  const LogHealthMarkerPage({super.key, this.selectedMonth});
 
   @override
   State<LogHealthMarkerPage> createState() => _LogHealthMarkerPageState();
@@ -11,6 +16,11 @@ class LogHealthMarkerPage extends StatefulWidget {
 
 class _LogHealthMarkerPageState extends State<LogHealthMarkerPage> {
   final _formKey = GlobalKey<FormState>();
+
+  final MonthlyHealthMarkerRepository _markerRepository =
+      MonthlyHealthMarkerRepository();
+
+  bool _isSaving = false;
 
   String _glucoseType = 'Fasting';
 
@@ -51,7 +61,9 @@ class _LogHealthMarkerPageState extends State<LogHealthMarkerPage> {
     return null;
   }
 
-  void _saveMarkers() {
+  Future<void> _saveMarkers() async {
+    if (_isSaving) return;
+
     final hasCholesterol =
         _totalCholesterolController.text.trim().isNotEmpty ||
         _ldlController.text.trim().isNotEmpty ||
@@ -59,7 +71,9 @@ class _LogHealthMarkerPageState extends State<LogHealthMarkerPage> {
         _triglyceridesController.text.trim().isNotEmpty;
 
     final hasGlucose = _glucoseController.text.trim().isNotEmpty;
+
     final hasSystolic = _systolicController.text.trim().isNotEmpty;
+
     final hasDiastolic = _diastolicController.text.trim().isNotEmpty;
 
     if (!hasCholesterol && !hasGlucose && !hasSystolic && !hasDiastolic) {
@@ -80,12 +94,73 @@ class _LogHealthMarkerPageState extends State<LogHealthMarkerPage> {
 
     if (!_formKey.currentState!.validate()) return;
 
-    // Firestore saving will be implemented later.
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Measurements validated. Firebase saving comes next.'),
-      ),
+    final measurements = <HealthMeasurementModel>[];
+
+    void addMeasurement(
+      String name,
+      TextEditingController controller,
+      String unit,
+    ) {
+      final value = controller.text.trim();
+
+      if (value.isEmpty) return;
+
+      measurements.add(
+        HealthMeasurementModel(
+          name: name,
+          value: double.parse(value),
+          unit: unit,
+        ),
+      );
+    }
+
+    addMeasurement('Total Cholesterol', _totalCholesterolController, 'mg/dL');
+
+    addMeasurement('LDL Cholesterol', _ldlController, 'mg/dL');
+
+    addMeasurement('HDL Cholesterol', _hdlController, 'mg/dL');
+
+    addMeasurement('Triglycerides', _triglyceridesController, 'mg/dL');
+
+    addMeasurement('$_glucoseType Blood Glucose', _glucoseController, 'mg/dL');
+
+    addMeasurement('Systolic Blood Pressure', _systolicController, 'mmHg');
+
+    addMeasurement('Diastolic Blood Pressure', _diastolicController, 'mmHg');
+
+    final selectedDate = widget.selectedMonth ?? DateTime.now();
+
+    final month =
+        '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}';
+
+    final markers = MonthlyHealthMarkerModel(
+      month: month,
+      measurements: measurements,
     );
+
+    setState(() {
+      _isSaving = true;
+    });
+
+    try {
+      await _markerRepository.saveMarkers(markers);
+
+      if (!mounted) return;
+
+      Navigator.pop(context, true);
+    } catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to save markers: $error')));
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
+    }
   }
 
   Widget _sectionCard({
@@ -318,8 +393,14 @@ class _LogHealthMarkerPageState extends State<LogHealthMarkerPage> {
               const SizedBox(height: 12),
 
               ElevatedButton(
-                onPressed: _saveMarkers,
-                child: const Text("Save This Month's Markers"),
+                onPressed: _isSaving ? null : _saveMarkers,
+                child: _isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text("Save This Month's Markers"),
               ),
 
               const SizedBox(height: 24),

@@ -40,7 +40,11 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const HealthProfilePage());
 
       case RouteNames.logHealthMarker:
-        return MaterialPageRoute(builder: (_) => const LogHealthMarkerPage());
+        final selectedMonth = settings.arguments as DateTime?;
+
+        return MaterialPageRoute(
+          builder: (_) => LogHealthMarkerPage(selectedMonth: selectedMonth),
+        );
 
       case RouteNames.addHealthReport:
         return MaterialPageRoute(builder: (_) => const AddHealthReportPage());

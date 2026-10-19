@@ -24,6 +24,34 @@ const validReport = {
   ],
 };
 
+
+const validMonthlyMarkers = {
+  month: '2026-10',
+  measurements: [
+    {
+      name: 'Total Cholesterol',
+      value: 185,
+      unit: 'mg/dL',
+    },
+    {
+      name: 'Fasting Blood Glucose',
+      value: 95,
+      unit: 'mg/dL',
+    },
+    {
+      name: 'Systolic Blood Pressure',
+      value: 120,
+      unit: 'mmHg',
+    },
+    {
+      name: 'Diastolic Blood Pressure',
+      value: 80,
+      unit: 'mmHg',
+    },
+  ],
+};
+
+
 // Load the rules from the Flutter project root.
 before(async () => {
   const rulesPath = path.join(
@@ -200,3 +228,318 @@ test('More than 10 measurements are rejected', async () => {
     }),
   );
 });
+
+
+// ==============================================
+// Monthly Health Marker Firestore Security Tests
+// ==============================================
+
+test('User A can create their own monthly markers', async () => {
+  const db = testEnv.authenticatedContext('userA').firestore();
+
+  const marker = db.doc(
+    'users/userA/monthlyHealthMarkers/2026-10'
+  );
+
+  await assertSucceeds(marker.set(validMonthlyMarkers));
+});
+
+test('User A can read their own monthly markers', async () => {
+  const db = testEnv.authenticatedContext('userA').firestore();
+
+  const marker = db.doc(
+    'users/userA/monthlyHealthMarkers/2026-10'
+  );
+
+  await assertSucceeds(marker.set(validMonthlyMarkers));
+  await assertSucceeds(marker.get());
+});
+
+test('User A can update their own monthly markers', async () => {
+  const db = testEnv.authenticatedContext('userA').firestore();
+
+  const marker = db.doc(
+    'users/userA/monthlyHealthMarkers/2026-10'
+  );
+
+  await assertSucceeds(marker.set(validMonthlyMarkers));
+
+  await assertSucceeds(
+    marker.update({
+      measurements: [
+        {
+          name: 'Total Cholesterol',
+          value: 190,
+          unit: 'mg/dL',
+        },
+      ],
+    }),
+  );
+});
+
+test('User A cannot read User B monthly markers', async () => {
+  const db = testEnv.authenticatedContext('userA').firestore();
+
+  const marker = db.doc(
+    'users/userB/monthlyHealthMarkers/2026-10'
+  );
+
+  await assertFails(marker.get());
+});
+
+test('User A cannot write User B monthly markers', async () => {
+  const db = testEnv.authenticatedContext('userA').firestore();
+
+  const marker = db.doc(
+    'users/userB/monthlyHealthMarkers/2026-10'
+  );
+
+  await assertFails(marker.set(validMonthlyMarkers));
+});
+
+test('Signed-out users cannot access monthly markers', async () => {
+  const db = testEnv.unauthenticatedContext().firestore();
+
+  const marker = db.doc(
+    'users/userA/monthlyHealthMarkers/2026-10'
+  );
+
+  await assertFails(marker.get());
+  await assertFails(marker.set(validMonthlyMarkers));
+});
+
+test('Invalid month document ID is rejected', async () => {
+  const db = testEnv.authenticatedContext('userA').firestore();
+
+  const marker = db.doc(
+    'users/userA/monthlyHealthMarkers/October2026'
+  );
+
+  await assertFails(marker.set(validMonthlyMarkers));
+});
+
+test('Mismatched month and document ID are rejected', async () => {
+  const db = testEnv.authenticatedContext('userA').firestore();
+
+  const marker = db.doc(
+    'users/userA/monthlyHealthMarkers/2026-10'
+  );
+
+  await assertFails(
+    marker.set({
+      ...validMonthlyMarkers,
+      month: '2026-09',
+    }),
+  );
+});
+
+test('Empty monthly measurements are rejected', async () => {
+  const db = testEnv.authenticatedContext('userA').firestore();
+
+  const marker = db.doc(
+    'users/userA/monthlyHealthMarkers/2026-10'
+  );
+
+  await assertFails(
+    marker.set({
+      ...validMonthlyMarkers,
+      measurements: [],
+    }),
+  );
+});
+
+test('Invalid monthly measurement value is rejected', async () => {
+  const db = testEnv.authenticatedContext('userA').firestore();
+
+  const marker = db.doc(
+    'users/userA/monthlyHealthMarkers/2026-10'
+  );
+
+  await assertFails(
+    marker.set({
+      ...validMonthlyMarkers,
+      measurements: [
+        {
+          name: 'Total Cholesterol',
+          value: -10,
+          unit: 'mg/dL',
+        },
+      ],
+    }),
+  );
+});
+
+test('Incorrect blood pressure unit is rejected', async () => {
+  const db = testEnv.authenticatedContext('userA').firestore();
+
+  const marker = db.doc(
+    'users/userA/monthlyHealthMarkers/2026-10'
+  );
+
+  await assertFails(
+    marker.set({
+      ...validMonthlyMarkers,
+      measurements: [
+        {
+          name: 'Systolic Blood Pressure',
+          value: 120,
+          unit: 'mg/dL',
+        },
+      ],
+    }),
+  );
+});
+
+test('More than 7 monthly measurements are rejected', async () => {
+  const db = testEnv.authenticatedContext('userA').firestore();
+
+  const marker = db.doc(
+    'users/userA/monthlyHealthMarkers/2026-10'
+  );
+
+  const measurements = Array.from(
+    { length: 8 },
+    () => ({
+      name: 'Total Cholesterol',
+      value: 185,
+      unit: 'mg/dL',
+    }),
+  );
+
+  await assertFails(
+    marker.set({
+      ...validMonthlyMarkers,
+      measurements,
+    }),
+  );
+});
+
+test('Unexpected monthly marker fields are rejected', async () => {
+  const db = testEnv.authenticatedContext('userA').firestore();
+
+  const marker = db.doc(
+    'users/userA/monthlyHealthMarkers/2026-10'
+  );
+
+  await assertFails(
+    marker.set({
+      ...validMonthlyMarkers,
+      unexpectedField: 'test',
+    }),
+  );
+});
+
+
+test('Duplicate monthly measurement names are rejected', async () => {
+  const db = testEnv.authenticatedContext('userA').firestore();
+
+  const marker = db.doc(
+    'users/userA/monthlyHealthMarkers/2026-10'
+  );
+
+  await assertFails(
+    marker.set({
+      month: '2026-10',
+      measurements: [
+        {
+          name: 'Total Cholesterol',
+          value: 185,
+          unit: 'mg/dL',
+        },
+        {
+          name: 'Total Cholesterol',
+          value: 190,
+          unit: 'mg/dL',
+        },
+      ],
+    }),
+  );
+});
+
+test('Incomplete blood pressure pairs are rejected', async () => {
+  const db = testEnv.authenticatedContext('userA').firestore();
+
+  const marker = db.doc(
+    'users/userA/monthlyHealthMarkers/2026-10'
+  );
+
+  await assertFails(
+    marker.set({
+      month: '2026-10',
+      measurements: [
+        {
+          name: 'Systolic Blood Pressure',
+          value: 120,
+          unit: 'mmHg',
+        },
+      ],
+    }),
+  );
+
+  await assertFails(
+    marker.set({
+      month: '2026-10',
+      measurements: [
+        {
+          name: 'Diastolic Blood Pressure',
+          value: 80,
+          unit: 'mmHg',
+        },
+      ],
+    }),
+  );
+});
+
+
+test('All seven monthly health markers can be saved together', async () => {
+  const db = testEnv.authenticatedContext('userA').firestore();
+
+  const marker = db.doc(
+    'users/userA/monthlyHealthMarkers/2026-10'
+  );
+
+  await assertSucceeds(
+    marker.set({
+      month: '2026-10',
+      measurements: [
+        {
+          name: 'Total Cholesterol',
+          value: 185,
+          unit: 'mg/dL',
+        },
+        {
+          name: 'LDL Cholesterol',
+          value: 110,
+          unit: 'mg/dL',
+        },
+        {
+          name: 'HDL Cholesterol',
+          value: 55,
+          unit: 'mg/dL',
+        },
+        {
+          name: 'Triglycerides',
+          value: 125,
+          unit: 'mg/dL',
+        },
+        {
+          name: 'Fasting Blood Glucose',
+          value: 95,
+          unit: 'mg/dL',
+        },
+        {
+          name: 'Systolic Blood Pressure',
+          value: 120,
+          unit: 'mmHg',
+        },
+        {
+          name: 'Diastolic Blood Pressure',
+          value: 80,
+          unit: 'mmHg',
+        },
+      ],
+    }),
+  );
+});
+
+
