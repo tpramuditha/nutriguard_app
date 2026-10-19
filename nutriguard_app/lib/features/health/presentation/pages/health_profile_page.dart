@@ -7,6 +7,7 @@ import '../../data/repositories/health_report_repository.dart';
 import '../widgets/health_report_card.dart';
 import 'health_report_detail_page.dart';
 import '../../data/models/health_report_model.dart';
+import 'health_report_history_page.dart';
 
 class HealthProfilePage extends StatefulWidget {
   const HealthProfilePage({super.key});
@@ -89,7 +90,14 @@ class _HealthProfilePageState extends State<HealthProfilePage> {
         ),
         actions: [
           TextButton.icon(
-            onPressed: () => _showComingSoon('Health history'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const HealthReportHistoryPage(),
+                ),
+              );
+            },
             icon: const Icon(Icons.history),
             label: const Text('History'),
           ),

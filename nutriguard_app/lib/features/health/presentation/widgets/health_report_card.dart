@@ -22,39 +22,59 @@ class HealthReportCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Material(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE0EFF2)),
-      ),
-      child: ListTile(
-        onTap: onTap,
-        contentPadding: const EdgeInsets.all(14),
-        leading: const CircleAvatar(
-          backgroundColor: Color(0xFFE2F5EF),
-          child: Icon(Icons.description_outlined, color: AppColors.primary),
-        ),
-        title: Text(
-          report.reportName,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: AppColors.primaryDark,
-          ),
-        ),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: 6),
-          child: Text(
-            '$formattedDate · '
-            '${report.measurements.length} measurements',
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.textSecondary,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0xFFE0EFF2)),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              children: [
+                const CircleAvatar(
+                  backgroundColor: Color(0xFFE2F5EF),
+                  child: Icon(
+                    Icons.description_outlined,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        report.reportName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryDark,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '$formattedDate · '
+                        '${report.measurements.length} measurements',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Icon(Icons.chevron_right, color: AppColors.primary),
+              ],
             ),
           ),
         ),
-        trailing: const Icon(Icons.chevron_right, color: AppColors.primary),
       ),
     );
   }
