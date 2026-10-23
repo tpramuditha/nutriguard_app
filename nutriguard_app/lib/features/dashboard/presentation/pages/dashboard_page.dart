@@ -60,6 +60,12 @@ class _DashboardPageState extends State<DashboardPage> {
       return;
     }
 
+    // Index 1 = Scanner
+    if (index == 1) {
+      Navigator.pushNamed(context, RouteNames.foodScanner);
+      return;
+    }
+
     // Index 4 = Profile
     if (index == 4) {
       Navigator.pushNamed(context, RouteNames.profile);
