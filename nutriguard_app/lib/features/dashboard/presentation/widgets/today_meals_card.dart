@@ -1,11 +1,153 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../app/routes/route_names.dart';
+import '../../../../app/theme/app_colors.dart';
+import '../../../food_scanner/data/models/food_log_model.dart';
+import '../../../food_scanner/data/repositories/food_log_repository.dart';
 import 'meal_suggestion_card.dart';
 
-import '../../../../app/theme/app_colors.dart';
-
-class TodayMealsCard extends StatelessWidget {
+class TodayMealsCard extends StatefulWidget {
   const TodayMealsCard({super.key});
+
+  @override
+  State<TodayMealsCard> createState() => _TodayMealsCardState();
+}
+
+class _TodayMealsCardState extends State<TodayMealsCard> {
+  final FoodLogRepository _repository = FoodLogRepository();
+
+  late Future<List<FoodLogModel>> _logsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _logsFuture = _loadFoodLogs();
+  }
+
+  Future<List<FoodLogModel>> _loadFoodLogs() {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      return Future<List<FoodLogModel>>.error(
+        StateError('Please log in to view your meals.'),
+      );
+    }
+
+    return _repository.getFoodLogs(userId: user.uid);
+  }
+
+  void _refreshMeals() {
+    setState(() {
+      _logsFuture = _loadFoodLogs();
+    });
+  }
+
+  Future<void> _openFoodHistory() async {
+    await Navigator.pushNamed(context, RouteNames.foodHistory);
+
+    if (!mounted) return;
+
+    _refreshMeals();
+  }
+
+  bool _isToday(DateTime date) {
+    final now = DateTime.now();
+    final localDate = date.toLocal();
+
+    return localDate.year == now.year &&
+        localDate.month == now.month &&
+        localDate.day == now.day;
+  }
+
+  List<FoodLogModel> _todaysLogs(List<FoodLogModel> allLogs) {
+    return allLogs.where((log) {
+      return _isToday(log.loggedAt);
+    }).toList();
+  }
+
+  String _imagePathForMeal(String mealType) {
+    switch (mealType) {
+      case 'Breakfast':
+        return 'assets/images/dashboard/breakfast.png';
+      case 'Lunch':
+        return 'assets/images/dashboard/lunch.png';
+      case 'Snack':
+        return 'assets/images/dashboard/snack.png';
+      default:
+        return 'assets/images/dashboard/dinner.png';
+    }
+  }
+
+  Widget _buildMealsContent() {
+    return FutureBuilder<List<FoodLogModel>>(
+      future: _logsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Column(
+            children: [
+              const Text(
+                'Unable to load today\'s meals.',
+                style: TextStyle(color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: _refreshMeals,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Try Again'),
+              ),
+            ],
+          );
+        }
+
+        final todaysLogs = _todaysLogs(snapshot.data ?? []);
+
+        if (todaysLogs.isEmpty) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.no_meals_outlined,
+                  color: AppColors.primary,
+                  size: 44,
+                ),
+                SizedBox(height: 12),
+                Text(
+                  'No meals logged today.',
+                  style: TextStyle(color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Column(
+          children: [
+            for (final log in todaysLogs) ...[
+              _mealItem(
+                context,
+                title: log.mealType,
+                description:
+                    '${log.foodName} '
+                    '(${log.grams.toStringAsFixed(0)} g)',
+                calories: log.calories.round(),
+                imagePath: _imagePathForMeal(log.mealType),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,21 +169,23 @@ class TodayMealsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Today's Meals",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+              const Expanded(
+                child: Text(
+                  "Today's Meals",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
-
+              IconButton(
+                tooltip: 'Refresh meals',
+                onPressed: _refreshMeals,
+                icon: const Icon(Icons.refresh),
+              ),
               TextButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Food History coming soon')),
-                  );
-                },
+                onPressed: _openFoodHistory,
                 child: const Text('View All'),
               ),
             ],
@@ -49,37 +193,11 @@ class TodayMealsCard extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          _mealItem(
-            context,
-            title: 'Breakfast',
-            description: 'Oats with banana & berries',
-            calories: 420,
-            imagePath: 'assets/images/dashboard/breakfast.png',
-          ),
-
-          const SizedBox(height: 12),
-
-          _mealItem(
-            context,
-            title: 'Lunch',
-            description: 'Chicken curry with rice & vegetables',
-            calories: 620,
-            imagePath: 'assets/images/dashboard/lunch.png',
-          ),
-
-          const SizedBox(height: 12),
-
-          _mealItem(
-            context,
-            title: 'Snack',
-            description: 'Mixed nuts (30g)',
-            calories: 210,
-            imagePath: 'assets/images/dashboard/snack.png',
-          ),
+          _buildMealsContent(),
 
           const SizedBox(height: 20),
 
-          // Sample AI suggestion banner
+          // Keep the existing AI suggestion banner.
           const MealSuggestionCard(),
         ],
       ),
@@ -98,11 +216,7 @@ class TodayMealsCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
-        onTap: () {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('$title details coming soon')));
-        },
+        onTap: _openFoodHistory,
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Row(
@@ -142,9 +256,7 @@ class TodayMealsCard extends StatelessWidget {
                         color: AppColors.textPrimary,
                       ),
                     ),
-
                     const SizedBox(height: 4),
-
                     Text(
                       description,
                       style: const TextStyle(

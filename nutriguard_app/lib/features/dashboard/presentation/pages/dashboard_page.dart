@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../../app/routes/route_names.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/services/firebase/firebase_auth_service.dart';
 import '../../../../shared/widgets/bottom_nav_bar.dart';
 import '../../../profile/presentation/widgets/logout_dialog.dart';
+import '../../../food_scanner/data/models/food_log_model.dart';
+import '../../../food_scanner/data/repositories/food_log_repository.dart';
 
 import '../widgets/macro_chart.dart';
 import '../widgets/quick_actions.dart';
@@ -21,8 +24,55 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   final FirebaseAuthService _authService = FirebaseAuthService();
+  final FoodLogRepository _foodLogRepository = FoodLogRepository();
 
   bool _isLoggingOut = false;
+
+  late Future<List<FoodLogModel>> _todaysFoodLogsFuture;
+  int _mealsRefreshVersion = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _todaysFoodLogsFuture = _loadTodaysFoodLogs();
+  }
+
+  Future<List<FoodLogModel>> _loadTodaysFoodLogs() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      throw StateError('Please log in to view your nutrition.');
+    }
+
+    final logs = await _foodLogRepository.getFoodLogs(userId: user.uid);
+
+    final now = DateTime.now();
+
+    return logs.where((log) {
+      final date = log.loggedAt.toLocal();
+
+      return date.year == now.year &&
+          date.month == now.month &&
+          date.day == now.day;
+    }).toList();
+  }
+
+  void _refreshDashboard() {
+    if (!mounted) return;
+
+    setState(() {
+      _todaysFoodLogsFuture = _loadTodaysFoodLogs();
+      _mealsRefreshVersion++;
+    });
+  }
+
+  Future<void> _openScanner() async {
+    await Navigator.pushNamed(context, RouteNames.foodScanner);
+
+    if (!mounted) return;
+
+    _refreshDashboard();
+  }
 
   Future<void> _logout() async {
     setState(() {
@@ -62,7 +112,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
     // Index 1 = Scanner
     if (index == 1) {
-      Navigator.pushNamed(context, RouteNames.foodScanner);
+      _openScanner();
       return;
     }
 
@@ -136,17 +186,76 @@ class _DashboardPageState extends State<DashboardPage> {
 
             const SizedBox(height: 24),
 
-            // Sample values for UI development
-            const CalorieProgressCard(
-              consumedCalories: 1450,
-              targetCalories: 2000,
-              burnedCalories: 120,
+            FutureBuilder<List<FoodLogModel>>(
+              future: _todaysFoodLogsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return const Padding(
+                    padding: EdgeInsets.all(30),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+
+                if (snapshot.hasError) {
+                  return Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          const Text('Unable to load daily nutrition.'),
+                          const SizedBox(height: 10),
+                          TextButton.icon(
+                            onPressed: _refreshDashboard,
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Try Again'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
+                final logs = snapshot.data ?? <FoodLogModel>[];
+
+                final totalCalories = logs.fold<double>(
+                  0,
+                  (sum, log) => sum + log.calories,
+                );
+
+                final totalProtein = logs.fold<double>(
+                  0,
+                  (sum, log) => sum + log.protein,
+                );
+
+                final totalCarbs = logs.fold<double>(
+                  0,
+                  (sum, log) => sum + log.carbs,
+                );
+
+                final totalFat = logs.fold<double>(
+                  0,
+                  (sum, log) => sum + log.fat,
+                );
+
+                return Column(
+                  children: [
+                    CalorieProgressCard(
+                      consumedCalories: totalCalories.round(),
+                      targetCalories: 2000,
+                      burnedCalories: 0,
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    MacroChart(
+                      consumedProtein: totalProtein,
+                      consumedCarbs: totalCarbs,
+                      consumedFat: totalFat,
+                    ),
+                  ],
+                );
+              },
             ),
-
-            const SizedBox(height: 24),
-
-            // Macronutrient progress
-            const MacroChart(),
 
             const SizedBox(height: 28),
 
@@ -156,7 +265,7 @@ class _DashboardPageState extends State<DashboardPage> {
             const SizedBox(height: 24),
 
             // Today's Meals
-            const TodayMealsCard(),
+            TodayMealsCard(key: ValueKey(_mealsRefreshVersion)),
 
             const SizedBox(height: 24),
           ],

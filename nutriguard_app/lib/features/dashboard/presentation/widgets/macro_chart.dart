@@ -3,7 +3,23 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 
 class MacroChart extends StatelessWidget {
-  const MacroChart({super.key});
+  final double consumedProtein;
+  final double consumedCarbs;
+  final double consumedFat;
+
+  final double targetProtein;
+  final double targetCarbs;
+  final double targetFat;
+
+  const MacroChart({
+    super.key,
+    required this.consumedProtein,
+    required this.consumedCarbs,
+    required this.consumedFat,
+    this.targetProtein = 90,
+    this.targetCarbs = 250,
+    this.targetFat = 65,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -40,14 +56,13 @@ class MacroChart extends StatelessWidget {
               ),
             ],
           ),
-
           const SizedBox(height: 22),
 
           _macroItem(
             title: 'Protein',
             icon: Icons.fitness_center,
-            consumed: 65,
-            target: 90,
+            consumed: consumedProtein,
+            target: targetProtein,
             color: const Color(0xFF4196EA),
           ),
 
@@ -56,8 +71,8 @@ class MacroChart extends StatelessWidget {
           _macroItem(
             title: 'Carbs',
             icon: Icons.grain,
-            consumed: 180,
-            target: 250,
+            consumed: consumedCarbs,
+            target: targetCarbs,
             color: const Color(0xFFFFB62F),
           ),
 
@@ -66,8 +81,8 @@ class MacroChart extends StatelessWidget {
           _macroItem(
             title: 'Fat',
             icon: Icons.water_drop,
-            consumed: 40,
-            target: 65,
+            consumed: consumedFat,
+            target: targetFat,
             color: const Color(0xFF9A70ED),
           ),
         ],
@@ -78,8 +93,8 @@ class MacroChart extends StatelessWidget {
   Widget _macroItem({
     required String title,
     required IconData icon,
-    required int consumed,
-    required int target,
+    required double consumed,
+    required double target,
     required Color color,
   }) {
     final progress = target > 0 ? (consumed / target).clamp(0.0, 1.0) : 0.0;
@@ -105,7 +120,8 @@ class MacroChart extends StatelessWidget {
               ),
             ),
             Text(
-              '${consumed}g / ${target}g',
+              '${consumed.toStringAsFixed(1)}g / '
+              '${target.toStringAsFixed(0)}g',
               style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 13,
