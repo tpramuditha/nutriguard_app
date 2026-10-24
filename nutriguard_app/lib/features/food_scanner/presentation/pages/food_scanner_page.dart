@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../app/routes/route_names.dart';
 import 'food_search_page.dart';
 
 class FoodScannerPage extends StatefulWidget {
@@ -209,11 +210,7 @@ class _FoodScannerPageState extends State<FoodScannerPage> {
         actions: [
           TextButton.icon(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Food History will be implemented later.'),
-                ),
-              );
+              Navigator.pushNamed(context, RouteNames.foodHistory);
             },
             icon: const Icon(Icons.history),
             label: const Text('History'),

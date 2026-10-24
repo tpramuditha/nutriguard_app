@@ -12,6 +12,7 @@ import '../../features/health/presentation/pages/add_health_report_page.dart';
 import '../../features/health/presentation/pages/confirm_detected_values_page.dart';
 import '../../features/health/presentation/pages/scan_health_report_page.dart';
 import '../../features/food_scanner/presentation/pages/food_scanner_page.dart';
+import '../../features/food_history/presentation/pages/food_history_page.dart';
 import 'route_names.dart';
 
 class AppRoutes {
@@ -31,6 +32,9 @@ class AppRoutes {
 
       case RouteNames.foodScanner:
         return MaterialPageRoute(builder: (_) => const FoodScannerPage());
+
+      case RouteNames.foodHistory:
+        return MaterialPageRoute(builder: (_) => const FoodHistoryPage());
 
       case RouteNames.mealRecommendation:
         return MaterialPageRoute(
