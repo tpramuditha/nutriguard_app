@@ -199,5 +199,115 @@ function uniqueMarkerNames(items) {
       allow delete: if isMarkerOwner();
     }
 
+    
+    // NutriGuard food logs
+    match /users/{userId}/foodLogs/{foodLogId} {
+
+      function isFoodLogOwner() {
+        return request.auth != null
+          && request.auth.uid == userId;
+      }
+
+      function validFoodLog() {
+        let data = request.resource.data;
+
+        return data.keys().hasAll([
+            'foodId',
+            'foodName',
+            'brand',
+            'source',
+            'grams',
+            'mealType',
+            'calories',
+            'protein',
+            'carbs',
+            'fat',
+            'loggedAt'
+          ])
+          && data.keys().hasOnly([
+            'foodId',
+            'foodName',
+            'brand',
+            'source',
+            'grams',
+            'mealType',
+            'calories',
+            'protein',
+            'carbs',
+            'fat',
+            'loggedAt'
+          ])
+
+          // Food identification
+          && data.foodId is string
+          && data.foodId.size() > 0
+          && data.foodId.size() <= 100
+
+          && data.foodName is string
+          && data.foodName.size() > 0
+          && data.foodName.size() <= 200
+
+          // Brand can be null.
+          && (
+            data.brand == null
+            || (
+              data.brand is string
+              && data.brand.size() <= 200
+            )
+          )
+
+          && data.source is string
+          && data.source.size() > 0
+          && data.source.size() <= 100
+
+          // Portion weight in grams
+          && data.grams is number
+          && data.grams > 0
+          && data.grams <= 5000
+
+          // Allowed meal types
+          && data.mealType is string
+          && data.mealType in [
+            'Breakfast',
+            'Lunch',
+            'Dinner',
+            'Snack'
+          ]
+
+          // Nutritional values for the selected portion
+          && data.calories is number
+          && data.calories >= 0
+          && data.calories <= 1000000
+
+          && data.protein is number
+          && data.protein >= 0
+          && data.protein <= 1000000
+
+          && data.carbs is number
+          && data.carbs >= 0
+          && data.carbs <= 1000000
+
+          && data.fat is number
+          && data.fat >= 0
+          && data.fat <= 1000000
+
+          // Firestore timestamp
+          && data.loggedAt is timestamp;
+      }
+
+      // Owners can read their own food logs.
+      allow read: if isFoodLogOwner();
+
+      // Owners can create valid food logs.
+      allow create: if isFoodLogOwner()
+        && validFoodLog();
+
+      // Editing existing logs is not implemented yet.
+      allow update: if false;
+
+      // Owners can delete their own logs.
+      allow delete: if isFoodLogOwner();
+    }
+
   }
 }

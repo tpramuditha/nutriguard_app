@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../data/models/food_model.dart';
 import '../../data/repositories/food_repository.dart';
 import '../widgets/food_portion_sheet.dart';
+import '../../data/models/food_log_model.dart';
+import '../../data/repositories/food_log_repository.dart';
 
 class FoodSearchPage extends StatefulWidget {
   const FoodSearchPage({super.key});
@@ -16,6 +19,10 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
   final TextEditingController _searchController = TextEditingController();
 
   final FoodRepository _foodRepository = FoodRepository();
+
+  final FoodLogRepository _foodLogRepository = FoodLogRepository();
+
+  bool _isSavingFood = false;
 
   List<FoodModel> _foods = [];
 
@@ -95,6 +102,8 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
   }
 
   Future<void> _openPortionSheet(FoodModel food) async {
+    if (_isSavingFood) return;
+
     final selection = await showModalBottomSheet<FoodPortionSelection>(
       context: context,
       isScrollControlled: true,
@@ -106,20 +115,64 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
       builder: (context) => FoodPortionSheet(food: food),
     );
 
-    if (!mounted || selection == null) {
+    if (!mounted || selection == null || _isSavingFood) {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          '${selection.food.name} — '
-          '${selection.grams.toStringAsFixed(0)} g — '
-          '${selection.mealType}. '
-          'Portion confirmed (not saved yet).',
-        ),
-      ),
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to save your food.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isSavingFood = true;
+    });
+
+    final selectedFood = selection.food;
+    final grams = selection.grams;
+
+    final foodLog = FoodLogModel(
+      foodId: selectedFood.id,
+      foodName: selectedFood.name,
+      brand: selectedFood.brand,
+      source: selectedFood.source,
+      grams: grams,
+      mealType: selection.mealType,
+      calories: selectedFood.caloriesForGrams(grams),
+      protein: selectedFood.proteinForGrams(grams),
+      carbs: selectedFood.carbsForGrams(grams),
+      fat: selectedFood.fatForGrams(grams),
+      loggedAt: DateTime.now(),
     );
+
+    try {
+      await _foodLogRepository.saveFoodLog(userId: user.uid, foodLog: foodLog);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${selectedFood.name} added to your food log!'),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to save food. Please try again.')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSavingFood = false;
+        });
+      }
+    }
   }
 
   Widget _buildFoodCard(FoodModel food) {
@@ -129,7 +182,7 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () => _openPortionSheet(food),
+        onTap: _isSavingFood ? null : () => _openPortionSheet(food),
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(
