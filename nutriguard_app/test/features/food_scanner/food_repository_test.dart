@@ -148,4 +148,137 @@ void main() {
 
     repository.dispose();
   });
+
+  test('barcode lookup returns a valid food', () async {
+    final client = MockClient((request) async {
+      expect(request.url.path, '/api/v2/product/1234567890123');
+
+      return http.Response(
+        jsonEncode({
+          'status': 1,
+          'product': {
+            'code': '1234567890123',
+            'product_name': 'Test Cereal',
+            'brands': 'Example Brand',
+            'nutriments': {
+              'energy-kcal_100g': 380,
+              'proteins_100g': 8,
+              'carbohydrates_100g': 70,
+              'fat_100g': 6,
+            },
+          },
+        }),
+        200,
+      );
+    });
+
+    final repository = FoodRepository(client: client);
+
+    final food = await repository.getFoodByBarcode('1234567890123');
+
+    expect(food, isNotNull);
+    expect(food!.name, 'Test Cereal');
+    expect(food.brand, 'Example Brand');
+    expect(food.source, 'Open Food Facts');
+    expect(food.caloriesPer100g, 380);
+    expect(food.proteinPer100g, 8);
+    expect(food.carbsPer100g, 70);
+    expect(food.fatPer100g, 6);
+
+    repository.dispose();
+  });
+
+  test('unknown barcode returns null', () async {
+    final client = MockClient((request) async {
+      return http.Response(
+        jsonEncode({'status': 0, 'status_verbose': 'product not found'}),
+        200,
+      );
+    });
+
+    final repository = FoodRepository(client: client);
+
+    final food = await repository.getFoodByBarcode('9999999999999');
+
+    expect(food, isNull);
+
+    repository.dispose();
+  });
+
+  test('barcode with incomplete nutrition returns null', () async {
+    final client = MockClient((request) async {
+      return http.Response(
+        jsonEncode({
+          'status': 1,
+          'product': {
+            'product_name': 'Incomplete Food',
+            'nutriments': {
+              'energy-kcal_100g': 120,
+              'proteins_100g': 4,
+              'carbohydrates_100g': 20,
+              // Fat is missing.
+            },
+          },
+        }),
+        200,
+      );
+    });
+
+    final repository = FoodRepository(client: client);
+
+    final food = await repository.getFoodByBarcode('1234567890123');
+
+    expect(food, isNull);
+
+    repository.dispose();
+  });
+
+  test('invalid barcode does not call the API', () async {
+    var requestCount = 0;
+
+    final client = MockClient((request) async {
+      requestCount++;
+      return http.Response('{}', 200);
+    });
+
+    final repository = FoodRepository(client: client);
+
+    expect(await repository.getFoodByBarcode(''), isNull);
+    expect(await repository.getFoodByBarcode('abc123'), isNull);
+    expect(requestCount, 0);
+
+    repository.dispose();
+  });
+
+  test('barcode lookup reports server errors', () async {
+    final client = MockClient((request) async {
+      return http.Response('Server Error', 500);
+    });
+
+    final repository = FoodRepository(client: client);
+
+    await expectLater(
+      repository.getFoodByBarcode('1234567890123'),
+      throwsA(isA<Exception>()),
+    );
+
+    repository.dispose();
+  });
+
+  test('barcode lookup returns null for HTTP 404', () async {
+    final client = MockClient((request) async {
+      return http.Response(
+        '{"status":0,"status_verbose":"product not found"}',
+        404,
+      );
+    });
+
+    final repository = FoodRepository(client: client);
+
+    final food = await repository.getFoodByBarcode('1019566');
+
+    expect(food, isNull);
+
+    repository.dispose();
+  });
 }

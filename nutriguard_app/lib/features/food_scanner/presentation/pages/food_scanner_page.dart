@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/routes/route_names.dart';
+import '../widgets/barcode_scanner_view.dart';
+import '../../data/repositories/food_repository.dart';
+import '../../data/models/food_log_model.dart';
+import '../../data/repositories/food_log_repository.dart';
+import '../widgets/food_portion_sheet.dart';
 import 'food_search_page.dart';
 
 class FoodScannerPage extends StatefulWidget {
@@ -13,6 +19,17 @@ class FoodScannerPage extends StatefulWidget {
 
 class _FoodScannerPageState extends State<FoodScannerPage> {
   int _selectedTab = 0;
+  int _scannerSession = 0;
+
+  final FoodRepository _foodRepository = FoodRepository();
+
+  final FoodLogRepository _foodLogRepository = FoodLogRepository();
+
+  @override
+  void dispose() {
+    _foodRepository.dispose();
+    super.dispose();
+  }
 
   final List<String> _tabs = const ['Barcode', 'Photo', 'Search', 'Manual'];
 
@@ -97,13 +114,144 @@ class _FoodScannerPageState extends State<FoodScannerPage> {
     );
   }
 
+  Future<void> _onBarcodeDetected(String barcode) async {
+    if (!mounted) return;
+
+    try {
+      // Show loading feedback while contacting Open Food Facts.
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Looking up barcode...'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      final food = await _foodRepository.getFoodByBarcode(barcode);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      if (food == null) {
+        await showDialog<void>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: const Text('Product Not Found'),
+            content: Text(
+              'Barcode: $barcode\n\n'
+              'We could not find this product with complete '
+              'nutrition information in Open Food Facts.\n\n'
+              'Try another product or use Search Food.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('Scan Again'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        final selection = await showModalBottomSheet<FoodPortionSelection>(
+          context: context,
+          isScrollControlled: true,
+          useSafeArea: true,
+          backgroundColor: Colors.white,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          builder: (context) => FoodPortionSheet(food: food),
+        );
+
+        if (!mounted || selection == null) return;
+
+        final user = FirebaseAuth.instance.currentUser;
+
+        if (user == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please log in to save your food.')),
+          );
+          return;
+        }
+
+        final selectedFood = selection.food;
+        final grams = selection.grams;
+
+        final foodLog = FoodLogModel(
+          foodId: selectedFood.id,
+          foodName: selectedFood.name,
+          brand: selectedFood.brand,
+          source: selectedFood.source,
+          grams: grams,
+          mealType: selection.mealType,
+          calories: selectedFood.caloriesForGrams(grams),
+          protein: selectedFood.proteinForGrams(grams),
+          carbs: selectedFood.carbsForGrams(grams),
+          fat: selectedFood.fatForGrams(grams),
+          loggedAt: DateTime.now(),
+        );
+
+        try {
+          await _foodLogRepository.saveFoodLog(
+            userId: user.uid,
+            foodLog: foodLog,
+          );
+
+          if (!mounted) return;
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${selectedFood.name} added to your food log!'),
+              backgroundColor: AppColors.primary,
+            ),
+          );
+        } catch (error) {
+          if (!mounted) return;
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Unable to save food. Please try again.'),
+            ),
+          );
+        }
+      }
+    } catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Lookup Failed'),
+          content: const Text(
+            'Unable to retrieve product information. '
+            'Check your internet connection and try again.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Scan Again'),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          // Recreate the camera scanner for the next barcode.
+          _scannerSession++;
+        });
+      }
+    }
+  }
+
   Widget _buildBarcodeTab() {
     return Column(
       children: [
-        _buildPlaceholder(
-          icon: Icons.qr_code_scanner,
-          title: 'Barcode Scanner',
-          description: 'Camera barcode scanning will be implemented next.',
+        BarcodeScannerView(
+          key: ValueKey(_scannerSession),
+          onBarcodeDetected: _onBarcodeDetected,
         ),
         const SizedBox(height: 14),
         const Text(
