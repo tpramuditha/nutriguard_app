@@ -7,8 +7,11 @@ import '../widgets/barcode_scanner_view.dart';
 import '../../data/repositories/food_repository.dart';
 import '../../data/models/food_log_model.dart';
 import '../../data/repositories/food_log_repository.dart';
+import '../../data/services/food_relog_mapper.dart';
 import '../widgets/food_portion_sheet.dart';
+import '../widgets/recently_logged_foods.dart';
 import 'food_search_page.dart';
+import 'manual_food_entry_page.dart';
 
 class FoodScannerPage extends StatefulWidget {
   const FoodScannerPage({super.key});
@@ -20,6 +23,8 @@ class FoodScannerPage extends StatefulWidget {
 class _FoodScannerPageState extends State<FoodScannerPage> {
   int _selectedTab = 0;
   int _scannerSession = 0;
+  int _recentFoodsVersion = 0;
+  bool _isRelogging = false;
 
   final FoodRepository _foodRepository = FoodRepository();
 
@@ -114,6 +119,95 @@ class _FoodScannerPageState extends State<FoodScannerPage> {
     );
   }
 
+  Future<void> _relogRecentFood(FoodLogModel previousLog) async {
+    if (_isRelogging || !mounted) return;
+
+    _isRelogging = true;
+
+    try {
+      // Reconstruct per-100g nutrition from the saved log.
+      final food = FoodRelogMapper.fromFoodLog(previousLog);
+
+      // Let the user confirm the new portion and meal type.
+      final selection = await showModalBottomSheet<FoodPortionSelection>(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        backgroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        builder: (_) => FoodPortionSheet(food: food),
+      );
+
+      if (!mounted || selection == null) return;
+
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please log in to save your food.')),
+        );
+        return;
+      }
+
+      final selectedFood = selection.food;
+      final grams = selection.grams;
+
+      // Create a new log using the confirmed portion.
+      final newLog = FoodLogModel(
+        foodId: selectedFood.id,
+        foodName: selectedFood.name,
+        brand: selectedFood.brand,
+        source: selectedFood.source,
+        grams: grams,
+        mealType: selection.mealType,
+        calories: selectedFood.caloriesForGrams(grams),
+        protein: selectedFood.proteinForGrams(grams),
+        carbs: selectedFood.carbsForGrams(grams),
+        fat: selectedFood.fatForGrams(grams),
+        loggedAt: DateTime.now(),
+      );
+
+      await _foodLogRepository.saveFoodLog(userId: user.uid, foodLog: newLog);
+
+      if (!mounted) return;
+
+      // Reload the Recently Logged cards.
+      setState(() {
+        _recentFoodsVersion++;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${selectedFood.name} added to your food log!'),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+    } on ArgumentError {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Saved food information is invalid. '
+            'Please search for the product again.',
+          ),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unable to save this food. Please try again.'),
+        ),
+      );
+    } finally {
+      _isRelogging = false;
+    }
+  }
+
   Future<void> _onBarcodeDetected(String barcode) async {
     if (!mounted) return;
 
@@ -199,6 +293,10 @@ class _FoodScannerPageState extends State<FoodScannerPage> {
 
           if (!mounted) return;
 
+          setState(() {
+            _recentFoodsVersion++;
+          });
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('${selectedFood.name} added to your food log!'),
@@ -281,7 +379,7 @@ class _FoodScannerPageState extends State<FoodScannerPage> {
             const SizedBox(width: 10),
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () => _selectTab(3),
+                onPressed: _openManualFoodEntry,
                 icon: const Icon(Icons.edit_note),
                 label: const Text(
                   'Type Manually',
@@ -293,6 +391,19 @@ class _FoodScannerPageState extends State<FoodScannerPage> {
         ),
       ],
     );
+  }
+
+  Future<void> _openManualFoodEntry() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ManualFoodEntryPage()),
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _recentFoodsVersion++;
+    });
   }
 
   Widget _buildTabContent() {
@@ -317,11 +428,17 @@ class _FoodScannerPageState extends State<FoodScannerPage> {
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const FoodSearchPage()),
                 );
+
+                if (!mounted) return;
+
+                setState(() {
+                  _recentFoodsVersion++;
+                });
               },
               icon: const Icon(Icons.search),
               label: const Text('Open Food Search'),
@@ -330,10 +447,20 @@ class _FoodScannerPageState extends State<FoodScannerPage> {
         );
 
       case 3:
-        return _buildPlaceholder(
-          icon: Icons.edit_note,
-          title: 'Manual Food Entry',
-          description: 'Manual nutrition entry will be implemented later.',
+        return Column(
+          children: [
+            _buildPlaceholder(
+              icon: Icons.edit_note,
+              title: 'Manual Food Entry',
+              description: 'Enter food and nutrition details manually.',
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _openManualFoodEntry,
+              icon: const Icon(Icons.edit_note),
+              label: const Text('Open Manual Entry'),
+            ),
+          ],
         );
 
       default:
@@ -383,9 +510,9 @@ class _FoodScannerPageState extends State<FoodScannerPage> {
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Your recently logged foods will appear here.',
-              style: TextStyle(color: AppColors.textSecondary),
+            RecentlyLoggedFoods(
+              key: ValueKey(_recentFoodsVersion),
+              onFoodSelected: _relogRecentFood,
             ),
             const SizedBox(height: 24),
           ],

@@ -296,7 +296,7 @@ class _FoodPortionSheetState extends State<FoodPortionSheet> {
 
               const Center(
                 child: Text(
-                  'This does not save food to your log yet.',
+                  'Confirm to add this food to your log.',
                   style: TextStyle(
                     fontSize: 11,
                     color: AppColors.textSecondary,
