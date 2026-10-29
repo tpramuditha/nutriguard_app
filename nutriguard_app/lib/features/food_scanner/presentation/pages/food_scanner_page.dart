@@ -12,6 +12,7 @@ import '../widgets/food_portion_sheet.dart';
 import '../widgets/recently_logged_foods.dart';
 import 'food_search_page.dart';
 import 'manual_food_entry_page.dart';
+import 'food_photo_page.dart';
 
 class FoodScannerPage extends StatefulWidget {
   const FoodScannerPage({super.key});
@@ -371,7 +372,7 @@ class _FoodScannerPageState extends State<FoodScannerPage> {
           children: [
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () => _selectTab(1),
+                onPressed: _openFoodPhotoPage,
                 icon: const Icon(Icons.camera_alt_outlined),
                 label: const Text('Take Photo', style: TextStyle(fontSize: 12)),
               ),
@@ -393,6 +394,19 @@ class _FoodScannerPageState extends State<FoodScannerPage> {
     );
   }
 
+  Future<void> _openFoodPhotoPage() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const FoodPhotoPage()),
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _recentFoodsVersion++;
+    });
+  }
+
   Future<void> _openManualFoodEntry() async {
     await Navigator.push(
       context,
@@ -412,10 +426,20 @@ class _FoodScannerPageState extends State<FoodScannerPage> {
         return _buildBarcodeTab();
 
       case 1:
-        return _buildPlaceholder(
-          icon: Icons.camera_alt_outlined,
-          title: 'Scan Food Photo',
-          description: 'Food photo recognition will be implemented later.',
+        return Column(
+          children: [
+            _buildPlaceholder(
+              icon: Icons.camera_alt_outlined,
+              title: 'Scan Food Photo',
+              description: 'Take a food photo or select one from your gallery.',
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _openFoodPhotoPage,
+              icon: const Icon(Icons.camera_alt_outlined),
+              label: const Text('Open Food Camera'),
+            ),
+          ],
         );
 
       case 2:
