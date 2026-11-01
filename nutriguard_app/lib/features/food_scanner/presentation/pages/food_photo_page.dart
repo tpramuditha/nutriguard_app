@@ -3,7 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'food_confirmation_page.dart';
+
 import '../../../../app/theme/app_colors.dart';
+import '../../data/services/food_recognition_service.dart';
 
 class FoodPhotoPage extends StatefulWidget {
   const FoodPhotoPage({super.key});
@@ -17,6 +20,10 @@ class _FoodPhotoPageState extends State<FoodPhotoPage> {
 
   XFile? _selectedImage;
   bool _isPicking = false;
+
+  bool _isRecognizing = false;
+
+  final FoodRecognitionService _recognitionService = FoodRecognitionService();
 
   Future<void> _pickImage(ImageSource source) async {
     if (_isPicking) return;
@@ -54,6 +61,57 @@ class _FoodPhotoPageState extends State<FoodPhotoPage> {
       if (mounted) {
         setState(() {
           _isPicking = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _recognizeFoodWithAI() async {
+    if (_selectedImage == null || _isRecognizing) {
+      return;
+    }
+
+    setState(() {
+      _isRecognizing = true;
+    });
+
+    try {
+      final result = await _recognitionService.recognizeFood(_selectedImage!);
+
+      if (!mounted) return;
+
+      if (result.foods.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No food was identified. Try another photo.'),
+          ),
+        );
+        return;
+      }
+
+      final confirmedFoods = await Navigator.push<List<String>>(
+        context,
+        MaterialPageRoute(builder: (_) => FoodConfirmationPage(result: result)),
+      );
+
+      if (!mounted || confirmedFoods == null) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Confirmed: ${confirmedFoods.join(', ')}'),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('AI recognition failed: $error')));
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isRecognizing = false;
         });
       }
     }
@@ -146,6 +204,26 @@ class _FoodPhotoPageState extends State<FoodPhotoPage> {
             if (_isPicking) ...[
               const SizedBox(height: 16),
               const Center(child: CircularProgressIndicator()),
+            ],
+
+            if (_selectedImage != null) ...[
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: _isRecognizing ? null : _recognizeFoodWithAI,
+                icon: _isRecognizing
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.auto_awesome),
+                label: Text(
+                  _isRecognizing
+                      ? 'Recognizing Food...'
+                      : 'Recognize Food with AI',
+                ),
+              ),
+              const SizedBox(height: 8),
             ],
 
             if (_selectedImage != null) ...[
