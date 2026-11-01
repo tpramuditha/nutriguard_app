@@ -6,7 +6,9 @@ import '../../data/models/food_log_model.dart';
 import '../../data/repositories/food_log_repository.dart';
 
 class ManualFoodEntryPage extends StatefulWidget {
-  const ManualFoodEntryPage({super.key});
+  final String? initialFoodName;
+
+  const ManualFoodEntryPage({super.key, this.initialFoodName});
 
   @override
   State<ManualFoodEntryPage> createState() => _ManualFoodEntryPageState();
@@ -26,6 +28,17 @@ class _ManualFoodEntryPageState extends State<ManualFoodEntryPage> {
   final _fatController = TextEditingController();
 
   String _mealType = 'Breakfast';
+
+  @override
+  void initState() {
+    super.initState();
+
+    final initialName = widget.initialFoodName?.trim();
+
+    if (initialName != null && initialName.isNotEmpty) {
+      _nameController.text = initialName;
+    }
+  }
 
   @override
   void dispose() {

@@ -7,6 +7,7 @@ import '../../data/repositories/food_repository.dart';
 import '../widgets/food_portion_sheet.dart';
 import '../../data/models/food_log_model.dart';
 import '../../data/repositories/food_log_repository.dart';
+import 'manual_food_entry_page.dart';
 
 class FoodSearchPage extends StatefulWidget {
   final String? initialQuery;
@@ -175,6 +176,13 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
 
       if (!mounted) return;
 
+      // When opened from AI recognition, return a successful save result.
+      if (widget.initialQuery != null) {
+        Navigator.pop(context, true);
+        return;
+      }
+
+      // Normal Food Search behavior remains unchanged.
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${selectedFood.name} added to your food log!'),
@@ -293,6 +301,37 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
     );
   }
 
+  Future<void> _openManualEntry() async {
+    final foodName = _searchController.text.trim();
+
+    final saved = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ManualFoodEntryPage(
+          initialFoodName: foodName.isEmpty ? null : foodName,
+        ),
+      ),
+    );
+
+    if (!mounted) return;
+
+    if (saved == true) {
+      // Return to AI workflow when Manual Entry saved successfully.
+      if (widget.initialQuery != null) {
+        Navigator.pop(context, true);
+        return;
+      }
+
+      // Keep the normal Search tab behavior unchanged.
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Manual food entry saved successfully!'),
+          backgroundColor: AppColors.primary,
+        ),
+      );
+    }
+  }
+
   Widget _buildResults() {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -390,7 +429,15 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
+
+            OutlinedButton.icon(
+              onPressed: _openManualEntry,
+              icon: const Icon(Icons.edit_note),
+              label: const Text("Can't find your food? Enter manually"),
+            ),
+
+            const SizedBox(height: 16),
 
             Expanded(child: _buildResults()),
           ],

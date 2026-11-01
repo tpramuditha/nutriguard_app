@@ -99,56 +99,116 @@ class _FoodPhotoPageState extends State<FoodPhotoPage> {
 
       if (confirmedFoods.isEmpty) return;
 
-      // Let the user choose which confirmed food to log first.
-      // We will support logging multiple foods in a later step.
+      // Keep track of confirmed foods that have not been logged or skipped.
+      final remainingFoods = List<String>.from(confirmedFoods);
 
-      final String? selectedFoodName = await showDialog<String>(
-        context: context,
-        builder: (dialogContext) {
-          return SimpleDialog(
-            title: const Text('Choose Food to Log'),
-            children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                child: Text(
-                  'Select a confirmed food to search for '
-                  'its nutrition information.',
-                ),
-              ),
+      int savedCount = 0;
 
-              for (final foodName in confirmedFoods)
-                SimpleDialogOption(
-                  onPressed: () {
-                    Navigator.pop(dialogContext, foodName);
-                  },
-                  child: Row(
-                    children: [
-                      const Icon(Icons.restaurant),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text(foodName)),
-                    ],
+      while (mounted && remainingFoods.isNotEmpty) {
+        final int? choice = await showDialog<int>(
+          context: context,
+          barrierDismissible: false,
+          builder: (dialogContext) {
+            return SimpleDialog(
+              title: const Text('Choose Food to Log'),
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  child: Text(
+                    'Choose a food to log, skip a food, '
+                    'or finish logging.',
                   ),
                 ),
 
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(dialogContext);
-                },
-                child: const Text('Cancel'),
-              ),
-            ],
+                for (var i = 0; i < remainingFoods.length; i++)
+                  ListTile(
+                    leading: const Icon(Icons.restaurant),
+                    title: Text(remainingFoods[i]),
+                    onTap: () {
+                      // A non-negative number means: log this food.
+                      Navigator.pop(dialogContext, i);
+                    },
+                    trailing: IconButton(
+                      tooltip: 'Skip ${remainingFoods[i]}',
+                      icon: const Icon(Icons.skip_next_outlined),
+                      onPressed: () {
+                        // Negative numbers below -1 mean: skip this food.
+                        Navigator.pop(dialogContext, -(i + 2));
+                      },
+                    ),
+                  ),
+
+                TextButton(
+                  onPressed: () {
+                    // -1 means: finish logging.
+                    Navigator.pop(dialogContext, -1);
+                  },
+                  child: const Text('Finish Logging'),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (!mounted || choice == null || choice == -1) {
+          break;
+        }
+
+        // Skip the selected food without saving it.
+        if (choice <= -2) {
+          final skipIndex = -choice - 2;
+
+          if (skipIndex >= 0 && skipIndex < remainingFoods.length) {
+            remainingFoods.removeAt(skipIndex);
+          }
+
+          continue;
+        }
+
+        if (choice >= remainingFoods.length) {
+          break;
+        }
+
+        final selectedFoodName = remainingFoods[choice];
+
+        // FoodSearchPage returns true only after successful saving.
+        final bool? saved = await Navigator.push<bool>(
+          context,
+          MaterialPageRoute(
+            builder: (_) => FoodSearchPage(initialQuery: selectedFoodName),
+          ),
+        );
+
+        if (!mounted) return;
+
+        if (saved == true) {
+          remainingFoods.removeAt(choice);
+          savedCount++;
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('$selectedFoodName logged successfully!'),
+              backgroundColor: AppColors.primary,
+            ),
           );
-        },
-      );
+        }
+        // If the user presses Back without saving, keep the food
+        // in the list so they can retry or skip it.
+      }
 
-      if (!mounted || selectedFoodName == null) return;
+      if (!mounted) return;
 
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => FoodSearchPage(initialQuery: selectedFoodName),
-        ),
-      );
+      if (savedCount > 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '$savedCount food${savedCount == 1 ? '' : 's'} '
+              'logged successfully!',
+            ),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+      }
     } catch (error) {
       if (!mounted) return;
 
