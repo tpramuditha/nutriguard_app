@@ -9,7 +9,9 @@ import '../../data/models/food_log_model.dart';
 import '../../data/repositories/food_log_repository.dart';
 
 class FoodSearchPage extends StatefulWidget {
-  const FoodSearchPage({super.key});
+  final String? initialQuery;
+
+  const FoodSearchPage({super.key, this.initialQuery});
 
   @override
   State<FoodSearchPage> createState() => _FoodSearchPageState();
@@ -31,6 +33,25 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
   String? _errorMessage;
 
   int _searchRequestId = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final initialQuery = widget.initialQuery?.trim();
+
+    if (initialQuery == null || initialQuery.isEmpty) {
+      return;
+    }
+
+    _searchController.text = initialQuery;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      _searchFoods();
+    });
+  }
 
   Future<void> _searchFoods() async {
     final query = _searchController.text.trim();

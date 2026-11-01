@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'food_confirmation_page.dart';
+import 'food_search_page.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../data/services/food_recognition_service.dart';
@@ -96,10 +97,56 @@ class _FoodPhotoPageState extends State<FoodPhotoPage> {
 
       if (!mounted || confirmedFoods == null) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Confirmed: ${confirmedFoods.join(', ')}'),
-          backgroundColor: AppColors.primary,
+      if (confirmedFoods.isEmpty) return;
+
+      // Let the user choose which confirmed food to log first.
+      // We will support logging multiple foods in a later step.
+
+      final String? selectedFoodName = await showDialog<String>(
+        context: context,
+        builder: (dialogContext) {
+          return SimpleDialog(
+            title: const Text('Choose Food to Log'),
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                child: Text(
+                  'Select a confirmed food to search for '
+                  'its nutrition information.',
+                ),
+              ),
+
+              for (final foodName in confirmedFoods)
+                SimpleDialogOption(
+                  onPressed: () {
+                    Navigator.pop(dialogContext, foodName);
+                  },
+                  child: Row(
+                    children: [
+                      const Icon(Icons.restaurant),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(foodName)),
+                    ],
+                  ),
+                ),
+
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                },
+                child: const Text('Cancel'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (!mounted || selectedFoodName == null) return;
+
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => FoodSearchPage(initialQuery: selectedFoodName),
         ),
       );
     } catch (error) {
@@ -238,8 +285,8 @@ class _FoodPhotoPageState extends State<FoodPhotoPage> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'AI food recognition will be connected next. '
-                'No photo has been uploaded.',
+                'Your selected photo will be sent securely to our AI service '
+                'when you tap Recognize Food with AI.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
               ),
