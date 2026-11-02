@@ -35,9 +35,12 @@ class NutritionAnalysisPage extends StatelessWidget {
     required double grams,
     required IconData icon,
     required Color color,
-    required double maxGrams,
+    required double energyKcal,
+    required double totalMacroEnergy,
   }) {
-    final progress = maxGrams > 0 ? (grams / maxGrams).clamp(0.0, 1.0) : 0.0;
+    final percentage = totalMacroEnergy > 0
+        ? (energyKcal / totalMacroEnergy * 100).clamp(0.0, 100.0)
+        : 0.0;
 
     return Padding(
       padding: const EdgeInsets.only(top: 16),
@@ -55,17 +58,26 @@ class NutritionAnalysisPage extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: _dark,
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: _dark,
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 10),
                     Text(
                       '${grams.toStringAsFixed(1)} g',
                       style: const TextStyle(color: Colors.blueGrey),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      '${percentage.toStringAsFixed(0)}%',
+                      style: const TextStyle(
+                        color: _dark,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
@@ -73,7 +85,7 @@ class NutritionAnalysisPage extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: LinearProgressIndicator(
-                    value: progress,
+                    value: percentage / 100,
                     minHeight: 9,
                     color: color,
                     backgroundColor: const Color(0xFFEAF1F5),
@@ -89,11 +101,11 @@ class NutritionAnalysisPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final maxMacro = [
-      foodLog.protein,
-      foodLog.carbs,
-      foodLog.fat,
-    ].reduce((a, b) => a > b ? a : b);
+    final proteinEnergy = foodLog.protein * 4;
+    final carbsEnergy = foodLog.carbs * 4;
+    final fatEnergy = foodLog.fat * 9;
+
+    final totalMacroEnergy = proteinEnergy + carbsEnergy + fatEnergy;
 
     return Scaffold(
       backgroundColor: _background,
@@ -238,31 +250,37 @@ class NutritionAnalysisPage extends StatelessWidget {
                     color: _dark,
                   ),
                 ),
+
                 _macroRow(
                   title: 'Protein',
                   grams: foodLog.protein,
                   icon: Icons.fitness_center,
                   color: const Color(0xFF439DFF),
-                  maxGrams: maxMacro,
+                  energyKcal: proteinEnergy,
+                  totalMacroEnergy: totalMacroEnergy,
                 ),
                 _macroRow(
                   title: 'Carbs',
                   grams: foodLog.carbs,
                   icon: Icons.grain,
                   color: const Color(0xFFFFAE39),
-                  maxGrams: maxMacro,
+                  energyKcal: carbsEnergy,
+                  totalMacroEnergy: totalMacroEnergy,
                 ),
                 _macroRow(
                   title: 'Fat',
                   grams: foodLog.fat,
                   icon: Icons.water_drop,
                   color: const Color(0xFF9B6AFF),
-                  maxGrams: maxMacro,
+                  energyKcal: fatEnergy,
+                  totalMacroEnergy: totalMacroEnergy,
                 ),
+
                 const SizedBox(height: 12),
+
                 const Text(
-                  'Bars compare the amounts of these three '
-                  'macronutrients in this portion.',
+                  'Percentages show each macronutrient\'s estimated '
+                  'share of total macro energy, not daily requirements.',
                   style: TextStyle(fontSize: 12, color: Colors.blueGrey),
                 ),
               ],
