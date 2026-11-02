@@ -5,6 +5,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../food_scanner/data/models/food_log_model.dart';
 import '../../../food_scanner/data/repositories/food_log_repository.dart';
 import '../../../../app/routes/route_names.dart';
+import '../../../nutrition/presentation/pages/nutrition_analysis_page.dart';
 
 class FoodHistoryPage extends StatefulWidget {
   const FoodHistoryPage({super.key});
@@ -232,6 +233,14 @@ class _FoodHistoryPageState extends State<FoodHistoryPage> {
       color: Colors.white,
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute<void>(
+              builder: (_) => NutritionAnalysisPage(foodLog: log),
+            ),
+          );
+        },
         leading: CircleAvatar(
           backgroundColor: const Color(0xFFE0F2EC),
           child: Icon(_mealIcon(log.mealType), color: AppColors.primary),
@@ -242,12 +251,19 @@ class _FoodHistoryPageState extends State<FoodHistoryPage> {
           ' · ${log.loggedAt.toLocal().hour.toString().padLeft(2, '0')}:'
           '${log.loggedAt.toLocal().minute.toString().padLeft(2, '0')}',
         ),
-        trailing: Text(
-          '${log.calories.toStringAsFixed(0)} kcal',
-          style: const TextStyle(
-            color: AppColors.primaryDark,
-            fontWeight: FontWeight.bold,
-          ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '${log.calories.toStringAsFixed(0)} kcal',
+              style: const TextStyle(
+                color: AppColors.primaryDark,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 6),
+            const Icon(Icons.chevron_right, color: AppColors.primary, size: 20),
+          ],
         ),
       ),
     );
