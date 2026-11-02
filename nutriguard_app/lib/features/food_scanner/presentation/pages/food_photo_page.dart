@@ -67,6 +67,43 @@ class _FoodPhotoPageState extends State<FoodPhotoPage> {
     }
   }
 
+  Future<bool> _showRecognitionError(String message) async {
+    if (!mounted) return false;
+
+    final retry = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.error_outline, color: Colors.orange),
+              SizedBox(width: 10),
+              Expanded(child: Text('Food Recognition Failed')),
+            ],
+          ),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, false);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, true);
+              },
+              child: const Text('Try Again'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return retry ?? false;
+  }
+
   Future<void> _recognizeFoodWithAI() async {
     if (_selectedImage == null || _isRecognizing) {
       return;
@@ -212,9 +249,23 @@ class _FoodPhotoPageState extends State<FoodPhotoPage> {
     } catch (error) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('AI recognition failed: $error')));
+      final retry = await _showRecognitionError(
+        error.toString().replaceFirst('Exception: ', ''),
+      );
+
+      if (!mounted) return;
+
+      if (retry) {
+        setState(() {
+          _isRecognizing = false;
+        });
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _recognizeFoodWithAI();
+          }
+        });
+      }
     } finally {
       if (mounted) {
         setState(() {

@@ -34,6 +34,8 @@ class _FoodPortionSheetState extends State<FoodPortionSheet> {
 
   double _grams = 150;
 
+  bool _nutritionSourceConfirmed = false;
+
   @override
   void dispose() {
     _gramsController.dispose();
@@ -159,6 +161,60 @@ class _FoodPortionSheetState extends State<FoodPortionSheet> {
 
               const SizedBox(height: 20),
 
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF8E8),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE8D8A8)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: Color(0xFF906B22),
+                          size: 20,
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Verify Nutrition Source',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Selected food: ${food.name}',
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                    if (food.brand != null)
+                      Text(
+                        'Brand: ${food.brand}',
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    Text(
+                      'Nutrition source: ${food.source}',
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'The nutrition values belong to this database entry. '
+                      'They may differ from your actual meal, especially '
+                      'for homemade foods.',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
               const Text(
                 'Nutrition for selected portion',
                 style: TextStyle(fontWeight: FontWeight.w600),
@@ -271,12 +327,31 @@ class _FoodPortionSheetState extends State<FoodPortionSheet> {
                 }).toList(),
               ),
 
+              CheckboxListTile(
+                value: _nutritionSourceConfirmed,
+                contentPadding: EdgeInsets.zero,
+                activeColor: AppColors.primary,
+                controlAffinity: ListTileControlAffinity.leading,
+                title: const Text(
+                  'I checked that this nutrition entry is appropriate '
+                  'for the food I consumed.',
+                  style: TextStyle(fontSize: 13),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _nutritionSourceConfirmed = value ?? false;
+                  });
+                },
+              ),
+
+              const SizedBox(height: 12),
+
               const SizedBox(height: 24),
 
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: validPortion
+                  onPressed: validPortion && _nutritionSourceConfirmed
                       ? () {
                           Navigator.pop(
                             context,

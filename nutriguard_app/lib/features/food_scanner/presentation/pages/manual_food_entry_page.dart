@@ -97,10 +97,83 @@ class _ManualFoodEntryPageState extends State<ManualFoodEntryPage> {
     );
   }
 
+  Future<bool> _confirmSuspiciousNutrition() async {
+    final calories = double.parse(_caloriesController.text.trim());
+    final protein = double.parse(_proteinController.text.trim());
+    final carbs = double.parse(_carbsController.text.trim());
+    final fat = double.parse(_fatController.text.trim());
+
+    final warnings = <String>[];
+
+    if (calories == 0) {
+      warnings.add('Calories are entered as 0 kcal.');
+    }
+
+    if (protein == 0 && carbs == 0 && fat == 0) {
+      warnings.add('Protein, carbohydrates and fat are all 0 g.');
+    }
+
+    if (calories > 0 && protein == 0 && carbs == 0 && fat == 0) {
+      warnings.add(
+        'Calories are greater than zero, but all macronutrients are zero.',
+      );
+    }
+
+    if (warnings.isEmpty) {
+      return true;
+    }
+
+    final shouldContinue = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Check Nutrition Values'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Some nutrition values may be incomplete or incorrect:',
+              ),
+              const SizedBox(height: 12),
+              for (final warning in warnings)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text('• $warning'),
+                ),
+              const SizedBox(height: 8),
+              const Text(
+                'Please verify the values for the exact portion '
+                'you consumed before saving.',
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Edit Values'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Save Anyway'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return shouldContinue ?? false;
+  }
+
   Future<void> _confirmEntry() async {
     if (_isSaving) return;
 
     if (!_formKey.currentState!.validate()) return;
+
+    final shouldContinue = await _confirmSuspiciousNutrition();
+
+    if (!mounted || !shouldContinue) return;
 
     final user = FirebaseAuth.instance.currentUser;
 

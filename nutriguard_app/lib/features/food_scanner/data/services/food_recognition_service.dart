@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:async';
 
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -47,10 +48,20 @@ class FoodRecognitionService {
       }
 
       return FoodRecognitionResult.fromJson(decoded);
+    } on TimeoutException {
+      throw Exception(
+        'Food recognition took too long. '
+        'Please check your connection and try again.',
+      );
     } on http.ClientException {
       throw Exception(
         'Cannot connect to the NutriGuard backend. '
-        'Make sure the Node.js server is running.',
+        'Check that Node.js is running and ADB reverse is active.',
+      );
+    } on FormatException {
+      throw Exception(
+        'The AI service returned an invalid response. '
+        'Please try again.',
       );
     }
   }
