@@ -12,7 +12,10 @@ class FoodRecognitionService {
 
   static const int _maxImageSize = 3 * 1024 * 1024;
 
-  Future<FoodRecognitionResult> recognizeFood(XFile image) async {
+  Future<FoodRecognitionResult> recognizeFood(
+    XFile image, {
+    http.Client? client,
+  }) async {
     final Uint8List imageBytes = await image.readAsBytes();
 
     if (imageBytes.isEmpty || imageBytes.length > _maxImageSize) {
@@ -22,16 +25,28 @@ class FoodRecognitionService {
     final String mimeType = _detectImageType(imageBytes);
 
     try {
-      final response = await http
-          .post(
-            Uri.parse('$_baseUrl/api/recognize-food'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'imageBase64': base64Encode(imageBytes),
-              'mimeType': mimeType,
-            }),
-          )
-          .timeout(const Duration(seconds: 70));
+      final uri = Uri.parse('$_baseUrl/api/recognize-food');
+
+      final requestBody = jsonEncode({
+        'imageBase64': base64Encode(imageBytes),
+        'mimeType': mimeType,
+      });
+
+      final responseFuture = client == null
+          ? http.post(
+              uri,
+              headers: {'Content-Type': 'application/json'},
+              body: requestBody,
+            )
+          : client.post(
+              uri,
+              headers: {'Content-Type': 'application/json'},
+              body: requestBody,
+            );
+
+      final response = await responseFuture.timeout(
+        const Duration(seconds: 70),
+      );
 
       final dynamic decoded = jsonDecode(response.body);
 
