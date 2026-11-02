@@ -109,47 +109,100 @@ class NutritionAnalysisPage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           // Food information card
+
           _card(
-            child: Row(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 88,
-                  height: 88,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE1F5ED),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(Icons.restaurant, color: _teal, size: 42),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 88,
+                      height: 88,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE1F5ED),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Icon(
+                        Icons.restaurant,
+                        color: _teal,
+                        size: 42,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            foodLog.foodName,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: _dark,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '${foodLog.grams.toStringAsFixed(0)} g'
+                            ' · ${foodLog.mealType}',
+                            style: const TextStyle(color: Colors.blueGrey),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.access_time,
+                                size: 15,
+                                color: Colors.blueGrey,
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                'Logged at '
+                                '${TimeOfDay.fromDateTime(foodLog.loggedAt.toLocal()).format(context)}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.blueGrey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        foodLog.foodName,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: _dark,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${foodLog.grams.toStringAsFixed(0)} g portion',
-                        style: const TextStyle(color: Colors.blueGrey),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        foodLog.mealType,
-                        style: const TextStyle(
+                const SizedBox(height: 14),
+                const Divider(height: 1),
+                const SizedBox(height: 14),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Chip(
+                        avatar: const Icon(
+                          Icons.verified_outlined,
+                          size: 16,
                           color: _teal,
-                          fontWeight: FontWeight.w600,
                         ),
+                        label: Text(
+                          foodLog.source,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        backgroundColor: const Color(0xFFEAF8F5),
+                        side: BorderSide.none,
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${foodLog.calories.toStringAsFixed(0)} kcal',
+                      style: const TextStyle(
+                        color: _teal,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
