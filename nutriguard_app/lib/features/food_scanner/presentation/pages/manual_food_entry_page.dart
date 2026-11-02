@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'dart:math';
+
 import '../../../../app/theme/app_colors.dart';
 import '../../data/models/food_log_model.dart';
 import '../../data/repositories/food_log_repository.dart';
@@ -19,6 +21,10 @@ class _ManualFoodEntryPageState extends State<ManualFoodEntryPage> {
   final FoodLogRepository _foodLogRepository = FoodLogRepository();
 
   bool _isSaving = false;
+
+  late final String _submissionId =
+      'manual-${DateTime.now().microsecondsSinceEpoch}-'
+      '${Random.secure().nextInt(1 << 32)}';
 
   final _nameController = TextEditingController();
   final _gramsController = TextEditingController();
@@ -203,7 +209,11 @@ class _ManualFoodEntryPageState extends State<ManualFoodEntryPage> {
     });
 
     try {
-      await _foodLogRepository.saveFoodLog(userId: user.uid, foodLog: foodLog);
+      await _foodLogRepository.saveFoodLog(
+        userId: user.uid,
+        foodLog: foodLog,
+        submissionId: _submissionId,
+      );
 
       if (!mounted) return;
 
