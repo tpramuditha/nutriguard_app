@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../nutrition/data/repositories/nutrition_goal_repository.dart';
+import '../../../nutrition/data/models/nutrition_goal_model.dart';
 
 class PersonalGoalsCard extends StatefulWidget {
   const PersonalGoalsCard({super.key});
@@ -12,6 +15,113 @@ class PersonalGoalsCard extends StatefulWidget {
 class _PersonalGoalsCardState extends State<PersonalGoalsCard> {
   String _selectedGoal = 'Weight Loss';
   int _calorieTarget = 2000;
+
+  final NutritionGoalRepository _nutritionGoalRepository =
+      NutritionGoalRepository();
+
+  bool _isLoading = true;
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNutritionGoal();
+  }
+
+  Future<void> _loadNutritionGoal() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      return;
+    }
+
+    try {
+      final goal = await _nutritionGoalRepository.getNutritionGoal(
+        userId: user.uid,
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _calorieTarget = goal.dailyCalorieTarget;
+        _selectedGoal = goal.goalType;
+      });
+    } catch (_) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to load nutrition goals.')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _saveNutritionGoal({
+    required int calorieTarget,
+    required String goalType,
+  }) async {
+    if (_isSaving) return;
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please log in to save your nutrition goals.'),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isSaving = true;
+    });
+
+    try {
+      await _nutritionGoalRepository.saveNutritionGoal(
+        userId: user.uid,
+        goal: NutritionGoalModel(
+          dailyCalorieTarget: calorieTarget,
+          goalType: goalType,
+        ),
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _calorieTarget = calorieTarget;
+        _selectedGoal = goalType;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nutrition goals saved successfully!')),
+      );
+    } catch (_) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unable to save nutrition goals. Please try again.'),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
+    }
+  }
 
   Future<void> _editCalorieTarget() async {
     String enteredValue = _calorieTarget.toString();
@@ -65,14 +175,24 @@ class _PersonalGoalsCardState extends State<PersonalGoalsCard> {
     if (!mounted) return;
 
     if (newTarget != null) {
-      setState(() {
-        _calorieTarget = newTarget;
-      });
+      await _saveNutritionGoal(
+        calorieTarget: newTarget,
+        goalType: _selectedGoal,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -127,13 +247,16 @@ class _PersonalGoalsCardState extends State<PersonalGoalsCard> {
                     child: Text('Weight Gain'),
                   ),
                 ],
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() {
-                      _selectedGoal = value;
-                    });
-                  }
-                },
+                onChanged: _isSaving
+                    ? null
+                    : (value) async {
+                        if (value != null && value != _selectedGoal) {
+                          await _saveNutritionGoal(
+                            calorieTarget: _calorieTarget,
+                            goalType: value,
+                          );
+                        }
+                      },
               ),
             ],
           ),
@@ -153,7 +276,7 @@ class _PersonalGoalsCardState extends State<PersonalGoalsCard> {
                 ),
               ),
               IconButton(
-                onPressed: _editCalorieTarget,
+                onPressed: _isSaving ? null : _editCalorieTarget,
                 icon: const Icon(Icons.edit_outlined, color: AppColors.primary),
               ),
             ],

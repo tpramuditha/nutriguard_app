@@ -309,5 +309,49 @@ function uniqueMarkerNames(items) {
       allow delete: if isFoodLogOwner();
     }
 
+    
+    // NutriGuard nutrition goals
+    match /users/{userId}/preferences/{preferenceId} {
+
+      function isNutritionGoalOwner() {
+        return request.auth != null
+          && request.auth.uid == userId;
+      }
+
+      function validNutritionGoal() {
+        let data = request.resource.data;
+
+        return data.keys().hasAll([
+            'dailyCalorieTarget',
+            'goalType'
+          ])
+          && data.keys().hasOnly([
+            'dailyCalorieTarget',
+            'goalType'
+          ])
+          && data.dailyCalorieTarget is int
+          && data.dailyCalorieTarget >= 1
+          && data.dailyCalorieTarget <= 10000
+          && data.goalType is string
+          && data.goalType in [
+            'Weight Loss',
+            'Maintain Weight',
+            'Weight Gain'
+          ];
+      }
+
+      // Only the nutrition preferences document is accessible.
+      allow read: if preferenceId == 'nutrition'
+        && isNutritionGoalOwner();
+
+      allow create, update: if preferenceId == 'nutrition'
+        && isNutritionGoalOwner()
+        && validNutritionGoal();
+
+      // Nutrition goals cannot be deleted from the client.
+      allow delete: if false;
+    }
+
+
   }
 }
