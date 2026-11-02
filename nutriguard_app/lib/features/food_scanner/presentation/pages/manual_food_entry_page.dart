@@ -9,8 +9,15 @@ import '../../data/repositories/food_log_repository.dart';
 
 class ManualFoodEntryPage extends StatefulWidget {
   final String? initialFoodName;
+  final FoodLogRepository? foodLogRepository;
+  final FirebaseAuth? firebaseAuth;
 
-  const ManualFoodEntryPage({super.key, this.initialFoodName});
+  const ManualFoodEntryPage({
+    super.key,
+    this.initialFoodName,
+    this.foodLogRepository,
+    this.firebaseAuth,
+  });
 
   @override
   State<ManualFoodEntryPage> createState() => _ManualFoodEntryPageState();
@@ -18,7 +25,8 @@ class ManualFoodEntryPage extends StatefulWidget {
 
 class _ManualFoodEntryPageState extends State<ManualFoodEntryPage> {
   final _formKey = GlobalKey<FormState>();
-  final FoodLogRepository _foodLogRepository = FoodLogRepository();
+  late final FoodLogRepository _foodLogRepository;
+  late final FirebaseAuth _firebaseAuth;
 
   bool _isSaving = false;
 
@@ -42,6 +50,10 @@ class _ManualFoodEntryPageState extends State<ManualFoodEntryPage> {
   @override
   void initState() {
     super.initState();
+
+    _foodLogRepository = widget.foodLogRepository ?? FoodLogRepository();
+
+    _firebaseAuth = widget.firebaseAuth ?? FirebaseAuth.instance;
 
     final initialName = widget.initialFoodName?.trim();
 
@@ -185,7 +197,7 @@ class _ManualFoodEntryPageState extends State<ManualFoodEntryPage> {
 
     if (!mounted || !shouldContinue) return;
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _firebaseAuth.currentUser;
 
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -255,6 +267,12 @@ class _ManualFoodEntryPageState extends State<ManualFoodEntryPage> {
           ),
         ),
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
     }
   }
 
@@ -363,14 +381,44 @@ class _ManualFoodEntryPageState extends State<ManualFoodEntryPage> {
               ),
             ),
 
-            if (_hasAttemptedSave) ...[
+            if (_hasAttemptedSave && !_isSaving) ...[
               const SizedBox(height: 14),
               const Text(
                 'Food details are locked for this submission. '
-                'If saving failed, you can retry using the '
-                'same details. To make changes, first check '
-                'Food History, then open a new entry.',
+                'You can retry saving the same food details.',
                 style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+              ),
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: () async {
+                  final shouldLeave = await showDialog<bool>(
+                    context: context,
+                    builder: (dialogContext) => AlertDialog(
+                      title: const Text('Start a New Entry?'),
+                      content: const Text(
+                        'Your previous food entry may already have '
+                        'been saved. Check Food History before '
+                        'creating another entry to avoid duplicates.',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(dialogContext, false),
+                          child: const Text('Keep This Entry'),
+                        ),
+                        FilledButton(
+                          onPressed: () => Navigator.pop(dialogContext, true),
+                          child: const Text('Leave Entry'),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (shouldLeave == true && context.mounted) {
+                    Navigator.pop(context);
+                  }
+                },
+                icon: const Icon(Icons.add_circle_outline),
+                label: const Text('Start New Entry'),
               ),
             ],
 
