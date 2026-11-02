@@ -16,6 +16,41 @@ class FoodLogRepository {
     return _firestore.collection('users').doc(userId).collection('foodLogs');
   }
 
+  // Compare the user-confirmed food details.
+  // foodId and loggedAt are excluded because the current
+  // Manual Entry screen recreates them on each save attempt.
+  bool _matchesExistingLog(
+    Map<String, dynamic> existing,
+    Map<String, dynamic> incoming,
+  ) {
+    const fields = [
+      'foodName',
+      'brand',
+      'source',
+      'grams',
+      'mealType',
+      'calories',
+      'protein',
+      'carbs',
+      'fat',
+    ];
+
+    for (final field in fields) {
+      final oldValue = existing[field];
+      final newValue = incoming[field];
+
+      if (oldValue is num && newValue is num) {
+        if (oldValue.toDouble() != newValue.toDouble()) {
+          return false;
+        }
+      } else if (oldValue != newValue) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   Future<String> saveFoodLog({
     required String userId,
     required FoodLogModel foodLog,
@@ -23,13 +58,12 @@ class FoodLogRepository {
   }) async {
     final collection = _foodLogs(userId);
 
-    // Existing behavior: create a new log for normal submissions.
+    // Preserve the original behavior for existing screens.
     if (submissionId == null) {
       final document = await collection.add(foodLog.toMap());
       return document.id;
     }
 
-    // Validate the ID used to identify one save operation.
     final id = submissionId.trim();
 
     if (id.isEmpty ||
@@ -40,10 +74,30 @@ class FoodLogRepository {
       throw ArgumentError('Invalid food log submission ID.');
     }
 
-    // Reusing this ID writes to the same Firestore document.
     final document = collection.doc(id);
+    final incomingData = foodLog.toMap();
 
-    await document.set(foodLog.toMap());
+    await _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(document);
+
+      if (snapshot.exists) {
+        final existingData = snapshot.data();
+
+        if (existingData == null ||
+            !_matchesExistingLog(existingData, incomingData)) {
+          throw StateError(
+            'This submission ID already belongs to '
+            'a different food log.',
+          );
+        }
+
+        // Already saved: no second write is needed.
+        return;
+      }
+
+      // First submission: create the document.
+      transaction.set(document, incomingData);
+    });
 
     return document.id;
   }
