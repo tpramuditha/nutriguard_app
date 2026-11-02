@@ -173,4 +173,74 @@ void main() {
       throwsArgumentError,
     );
   });
+
+  test('same submission ID with different foodId is rejected', () async {
+    final originalLog = makeFoodLog();
+
+    await repository.saveFoodLog(
+      userId: userId,
+      foodLog: originalLog,
+      submissionId: 'submission-001',
+    );
+
+    final changedLog = FoodLogModel(
+      foodId: 'different-food-id',
+      foodName: originalLog.foodName,
+      brand: originalLog.brand,
+      source: originalLog.source,
+      grams: originalLog.grams,
+      mealType: originalLog.mealType,
+      calories: originalLog.calories,
+      protein: originalLog.protein,
+      carbs: originalLog.carbs,
+      fat: originalLog.fat,
+      loggedAt: originalLog.loggedAt,
+    );
+
+    await expectLater(
+      repository.saveFoodLog(
+        userId: userId,
+        foodLog: changedLog,
+        submissionId: 'submission-001',
+      ),
+      throwsStateError,
+    );
+
+    expect(await countFoodLogs(), 1);
+  });
+
+  test('same submission ID with different loggedAt is rejected', () async {
+    final originalLog = makeFoodLog();
+
+    await repository.saveFoodLog(
+      userId: userId,
+      foodLog: originalLog,
+      submissionId: 'submission-001',
+    );
+
+    final changedLog = FoodLogModel(
+      foodId: originalLog.foodId,
+      foodName: originalLog.foodName,
+      brand: originalLog.brand,
+      source: originalLog.source,
+      grams: originalLog.grams,
+      mealType: originalLog.mealType,
+      calories: originalLog.calories,
+      protein: originalLog.protein,
+      carbs: originalLog.carbs,
+      fat: originalLog.fat,
+      loggedAt: originalLog.loggedAt.add(const Duration(minutes: 1)),
+    );
+
+    await expectLater(
+      repository.saveFoodLog(
+        userId: userId,
+        foodLog: changedLog,
+        submissionId: 'submission-001',
+      ),
+      throwsStateError,
+    );
+
+    expect(await countFoodLogs(), 1);
+  });
 }

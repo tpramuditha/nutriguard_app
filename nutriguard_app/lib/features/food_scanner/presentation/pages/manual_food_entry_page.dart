@@ -26,6 +26,8 @@ class _ManualFoodEntryPageState extends State<ManualFoodEntryPage> {
       'manual-${DateTime.now().microsecondsSinceEpoch}-'
       '${Random.secure().nextInt(1 << 32)}';
 
+  late final DateTime _submissionLoggedAt = DateTime.now();
+
   final _nameController = TextEditingController();
   final _gramsController = TextEditingController();
   final _caloriesController = TextEditingController();
@@ -191,7 +193,7 @@ class _ManualFoodEntryPageState extends State<ManualFoodEntryPage> {
     }
 
     final foodLog = FoodLogModel(
-      foodId: 'manual-${DateTime.now().microsecondsSinceEpoch}',
+      foodId: _submissionId,
       foodName: _nameController.text.trim(),
       brand: null,
       source: 'Manual Entry',
@@ -201,7 +203,7 @@ class _ManualFoodEntryPageState extends State<ManualFoodEntryPage> {
       protein: double.parse(_proteinController.text.trim()),
       carbs: double.parse(_carbsController.text.trim()),
       fat: double.parse(_fatController.text.trim()),
-      loggedAt: DateTime.now(),
+      loggedAt: _submissionLoggedAt,
     );
 
     setState(() {

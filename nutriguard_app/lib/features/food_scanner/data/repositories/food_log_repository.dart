@@ -19,11 +19,13 @@ class FoodLogRepository {
   // Compare the user-confirmed food details.
   // foodId and loggedAt are excluded because the current
   // Manual Entry screen recreates them on each save attempt.
+
   bool _matchesExistingLog(
     Map<String, dynamic> existing,
     Map<String, dynamic> incoming,
   ) {
     const fields = [
+      'foodId',
       'foodName',
       'brand',
       'source',
@@ -48,7 +50,29 @@ class FoodLogRepository {
       }
     }
 
-    return true;
+    // Firestore may return a Timestamp even if the original
+    // food log was created using a Dart DateTime.
+    DateTime? asDateTime(dynamic value) {
+      if (value is Timestamp) {
+        return value.toDate();
+      }
+
+      if (value is DateTime) {
+        return value;
+      }
+
+      return null;
+    }
+
+    final oldLoggedAt = asDateTime(existing['loggedAt']);
+    final newLoggedAt = asDateTime(incoming['loggedAt']);
+
+    if (oldLoggedAt == null || newLoggedAt == null) {
+      return false;
+    }
+
+    return oldLoggedAt.millisecondsSinceEpoch ==
+        newLoggedAt.millisecondsSinceEpoch;
   }
 
   Future<String> saveFoodLog({
