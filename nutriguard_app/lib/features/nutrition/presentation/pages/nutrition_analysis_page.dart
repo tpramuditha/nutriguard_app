@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../food_scanner/data/models/food_log_model.dart';
 
+import '../widgets/nutrition_budget_card.dart';
+
 class NutritionAnalysisPage extends StatelessWidget {
   final FoodLogModel foodLog;
 
@@ -290,33 +292,7 @@ class NutritionAnalysisPage extends StatelessWidget {
           const SizedBox(height: 14),
 
           // Daily budget section
-          _card(
-            child: const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.pie_chart, color: _teal),
-                    SizedBox(width: 8),
-                    Text(
-                      "Impact on Today's Budget",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                        color: _dark,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 12),
-                Text(
-                  'Your daily calorie goal will appear here '
-                  'after we connect your personal nutrition target.',
-                  style: TextStyle(color: Colors.blueGrey),
-                ),
-              ],
-            ),
-          ),
+          NutritionBudgetCard(foodLog: foodLog),
 
           const SizedBox(height: 14),
 
