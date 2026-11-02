@@ -19,8 +19,31 @@ class FoodLogRepository {
   Future<String> saveFoodLog({
     required String userId,
     required FoodLogModel foodLog,
+    String? submissionId,
   }) async {
-    final document = await _foodLogs(userId).add(foodLog.toMap());
+    final collection = _foodLogs(userId);
+
+    // Existing behavior: create a new log for normal submissions.
+    if (submissionId == null) {
+      final document = await collection.add(foodLog.toMap());
+      return document.id;
+    }
+
+    // Validate the ID used to identify one save operation.
+    final id = submissionId.trim();
+
+    if (id.isEmpty ||
+        id.contains('/') ||
+        id == '.' ||
+        id == '..' ||
+        id.length > 200) {
+      throw ArgumentError('Invalid food log submission ID.');
+    }
+
+    // Reusing this ID writes to the same Firestore document.
+    final document = collection.doc(id);
+
+    await document.set(foodLog.toMap());
 
     return document.id;
   }
