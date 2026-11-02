@@ -22,6 +22,8 @@ class _ManualFoodEntryPageState extends State<ManualFoodEntryPage> {
 
   bool _isSaving = false;
 
+  bool _hasAttemptedSave = false;
+
   late final String _submissionId =
       'manual-${DateTime.now().microsecondsSinceEpoch}-'
       '${Random.secure().nextInt(1 << 32)}';
@@ -208,6 +210,7 @@ class _ManualFoodEntryPageState extends State<ManualFoodEntryPage> {
 
     setState(() {
       _isSaving = true;
+      _hasAttemptedSave = true;
     });
 
     try {
@@ -229,18 +232,29 @@ class _ManualFoodEntryPageState extends State<ManualFoodEntryPage> {
       // Return to Food Scanner.
       // The parent page already refreshes Recently Logged.
       Navigator.pop(context, true);
+    } on StateError catch (_) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'This food entry may already be saved. '
+            'Please check Food History before trying again.',
+          ),
+          duration: Duration(seconds: 5),
+        ),
+      );
     } catch (error) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to save food. Please try again.')),
+        const SnackBar(
+          content: Text(
+            'Unable to save food. Please check your connection '
+            'and try again.',
+          ),
+        ),
       );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSaving = false;
-        });
-      }
     }
   }
 
@@ -270,53 +284,98 @@ class _ManualFoodEntryPageState extends State<ManualFoodEntryPage> {
             ),
             const SizedBox(height: 20),
 
-            TextFormField(
-              controller: _nameController,
-              maxLength: 200,
-              decoration: const InputDecoration(
-                labelText: 'Food Name',
-                hintText: 'e.g. Rice and Dhal Curry',
-                border: OutlineInputBorder(),
+            // Once saving has been attempted, keep the
+            // original food details unchanged for retries.
+            AbsorbPointer(
+              absorbing: _hasAttemptedSave,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _nameController,
+                    maxLength: 200,
+                    decoration: const InputDecoration(
+                      labelText: 'Food Name',
+                      hintText: 'e.g. Rice and Dhal Curry',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      final name = value?.trim() ?? '';
+
+                      if (name.isEmpty) {
+                        return 'Enter food name';
+                      }
+
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  _numberField(
+                    'Portion Size',
+                    _gramsController,
+                    'g',
+                    isGrams: true,
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  _numberField('Calories', _caloriesController, 'kcal'),
+
+                  const SizedBox(height: 14),
+
+                  _numberField('Protein', _proteinController, 'g'),
+
+                  const SizedBox(height: 14),
+
+                  _numberField('Carbohydrates', _carbsController, 'g'),
+
+                  const SizedBox(height: 14),
+
+                  _numberField('Fat', _fatController, 'g'),
+
+                  const SizedBox(height: 20),
+
+                  DropdownButtonFormField<String>(
+                    initialValue: _mealType,
+                    decoration: const InputDecoration(
+                      labelText: 'Meal Type',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'Breakfast',
+                        child: Text('Breakfast'),
+                      ),
+                      DropdownMenuItem(value: 'Lunch', child: Text('Lunch')),
+                      DropdownMenuItem(value: 'Dinner', child: Text('Dinner')),
+                      DropdownMenuItem(value: 'Snack', child: Text('Snack')),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          _mealType = value;
+                        });
+                      }
+                    },
+                  ),
+                ],
               ),
-              validator: (value) {
-                final name = value?.trim() ?? '';
-                if (name.isEmpty) return 'Enter food name';
-                return null;
-              },
             ),
 
-            const SizedBox(height: 14),
-            _numberField('Portion Size', _gramsController, 'g', isGrams: true),
-            const SizedBox(height: 14),
-            _numberField('Calories', _caloriesController, 'kcal'),
-            const SizedBox(height: 14),
-            _numberField('Protein', _proteinController, 'g'),
-            const SizedBox(height: 14),
-            _numberField('Carbohydrates', _carbsController, 'g'),
-            const SizedBox(height: 14),
-            _numberField('Fat', _fatController, 'g'),
-
-            const SizedBox(height: 20),
-            DropdownButtonFormField<String>(
-              initialValue: _mealType,
-              decoration: const InputDecoration(
-                labelText: 'Meal Type',
-                border: OutlineInputBorder(),
+            if (_hasAttemptedSave) ...[
+              const SizedBox(height: 14),
+              const Text(
+                'Food details are locked for this submission. '
+                'If saving failed, you can retry using the '
+                'same details. To make changes, first check '
+                'Food History, then open a new entry.',
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
               ),
-              items: const [
-                DropdownMenuItem(value: 'Breakfast', child: Text('Breakfast')),
-                DropdownMenuItem(value: 'Lunch', child: Text('Lunch')),
-                DropdownMenuItem(value: 'Dinner', child: Text('Dinner')),
-                DropdownMenuItem(value: 'Snack', child: Text('Snack')),
-              ],
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() => _mealType = value);
-                }
-              },
-            ),
+            ],
 
             const SizedBox(height: 24),
+
             ElevatedButton.icon(
               onPressed: _isSaving ? null : _confirmEntry,
               icon: _isSaving
