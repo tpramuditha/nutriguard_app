@@ -8,6 +8,8 @@ import '../../../../shared/widgets/bottom_nav_bar.dart';
 import '../../../profile/presentation/widgets/logout_dialog.dart';
 import '../../../food_scanner/data/models/food_log_model.dart';
 import '../../../food_scanner/data/repositories/food_log_repository.dart';
+import '../../../nutrition/data/models/nutrition_goal_model.dart';
+import '../../../nutrition/data/repositories/nutrition_goal_repository.dart';
 
 import '../widgets/macro_chart.dart';
 import '../widgets/quick_actions.dart';
@@ -26,15 +28,32 @@ class _DashboardPageState extends State<DashboardPage> {
   final FirebaseAuthService _authService = FirebaseAuthService();
   final FoodLogRepository _foodLogRepository = FoodLogRepository();
 
+  final NutritionGoalRepository _nutritionGoalRepository =
+      NutritionGoalRepository();
+
+  late Future<NutritionGoalModel> _nutritionGoalFuture;
+
   bool _isLoggingOut = false;
 
   late Future<List<FoodLogModel>> _todaysFoodLogsFuture;
   int _mealsRefreshVersion = 0;
 
+  Future<NutritionGoalModel> _loadNutritionGoal() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      throw StateError('Please log in to view your nutrition goal.');
+    }
+
+    return _nutritionGoalRepository.getNutritionGoal(userId: user.uid);
+  }
+
   @override
   void initState() {
     super.initState();
+
     _todaysFoodLogsFuture = _loadTodaysFoodLogs();
+    _nutritionGoalFuture = _loadNutritionGoal();
   }
 
   Future<List<FoodLogModel>> _loadTodaysFoodLogs() async {
@@ -62,6 +81,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
     setState(() {
       _todaysFoodLogsFuture = _loadTodaysFoodLogs();
+      _nutritionGoalFuture = _loadNutritionGoal();
       _mealsRefreshVersion++;
     });
   }
@@ -239,10 +259,48 @@ class _DashboardPageState extends State<DashboardPage> {
 
                 return Column(
                   children: [
-                    CalorieProgressCard(
-                      consumedCalories: totalCalories.round(),
-                      targetCalories: 2000,
-                      burnedCalories: 0,
+                    FutureBuilder<NutritionGoalModel>(
+                      future: _nutritionGoalFuture,
+                      builder: (context, goalSnapshot) {
+                        if (goalSnapshot.connectionState !=
+                            ConnectionState.done) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
+
+                        if (goalSnapshot.hasError || !goalSnapshot.hasData) {
+                          return Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                children: [
+                                  const Text(
+                                    'Unable to load your calorie target.',
+                                  ),
+                                  const SizedBox(height: 8),
+                                  TextButton.icon(
+                                    onPressed: _refreshDashboard,
+                                    icon: const Icon(Icons.refresh),
+                                    label: const Text('Try Again'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+
+                        final goal = goalSnapshot.data!;
+
+                        return CalorieProgressCard(
+                          consumedCalories: totalCalories.round(),
+                          targetCalories: goal.dailyCalorieTarget,
+                          burnedCalories: 0,
+                        );
+                      },
                     ),
 
                     const SizedBox(height: 24),
