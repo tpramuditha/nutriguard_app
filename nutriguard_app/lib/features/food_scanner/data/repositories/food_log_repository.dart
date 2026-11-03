@@ -2,6 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/food_log_model.dart';
 
+class FoodLogRecord {
+  final String documentId;
+  final FoodLogModel foodLog;
+
+  const FoodLogRecord({required this.documentId, required this.foodLog});
+}
+
 class FoodLogRepository {
   final FirebaseFirestore _firestore;
 
@@ -133,6 +140,21 @@ class FoodLogRepository {
 
     return snapshot.docs.map((document) {
       return FoodLogModel.fromMap(document.data());
+    }).toList();
+  }
+
+  Future<List<FoodLogRecord>> getFoodLogRecords({
+    required String userId,
+  }) async {
+    final snapshot = await _foodLogs(userId)
+        .orderBy('loggedAt', descending: true)
+        .get();
+
+    return snapshot.docs.map((document) {
+      return FoodLogRecord(
+        documentId: document.id,
+        foodLog: FoodLogModel.fromMap(document.data()),
+      );
     }).toList();
   }
 }

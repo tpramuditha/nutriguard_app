@@ -16,6 +16,10 @@ class FoodLogModel {
 
   final DateTime loggedAt;
 
+  // Optional device-local image path.
+  // Null means the food log has no saved photo.
+  final String? localImagePath;
+
   const FoodLogModel({
     required this.foodId,
     required this.foodName,
@@ -28,6 +32,7 @@ class FoodLogModel {
     required this.carbs,
     required this.fat,
     required this.loggedAt,
+    this.localImagePath,
   });
 
   Map<String, dynamic> toMap() {
@@ -47,6 +52,13 @@ class FoodLogModel {
   }
 
   factory FoodLogModel.fromMap(Map<String, dynamic> map) {
+    final imageValue = map['localImagePath'];
+
+    final String? imagePath =
+        imageValue is String && imageValue.trim().isNotEmpty
+        ? imageValue
+        : null;
+
     return FoodLogModel(
       foodId: map['foodId'] as String,
       foodName: map['foodName'] as String,
@@ -59,6 +71,7 @@ class FoodLogModel {
       carbs: (map['carbs'] as num).toDouble(),
       fat: (map['fat'] as num).toDouble(),
       loggedAt: (map['loggedAt'] as Timestamp).toDate(),
+      localImagePath: imagePath,
     );
   }
 }

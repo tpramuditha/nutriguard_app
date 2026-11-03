@@ -17,7 +17,7 @@ class FoodHistoryPage extends StatefulWidget {
 class _FoodHistoryPageState extends State<FoodHistoryPage> {
   final FoodLogRepository _repository = FoodLogRepository();
 
-  late Future<List<FoodLogModel>> _logsFuture;
+  late Future<List<FoodLogRecord>> _logsFuture;
 
   DateTime _selectedDate = DateTime.now();
   String _selectedFilter = 'All';
@@ -38,7 +38,7 @@ class _FoodHistoryPageState extends State<FoodHistoryPage> {
 
     _logsFuture = user == null
         ? Future.error(StateError('Please log in to view food history.'))
-        : _repository.getFoodLogs(userId: user.uid);
+        : _repository.getFoodLogRecords(userId: user.uid);
   }
 
   Future<void> _refresh() async {
@@ -228,7 +228,7 @@ class _FoodHistoryPageState extends State<FoodHistoryPage> {
     }
   }
 
-  Widget _foodTile(FoodLogModel log) {
+  Widget _foodTile(FoodLogModel log, {String? documentId}) {
     return Card(
       color: Colors.white,
       margin: const EdgeInsets.only(bottom: 8),
@@ -237,7 +237,10 @@ class _FoodHistoryPageState extends State<FoodHistoryPage> {
           Navigator.push(
             context,
             MaterialPageRoute<void>(
-              builder: (_) => NutritionAnalysisPage(foodLog: log),
+              builder: (_) => NutritionAnalysisPage(
+                foodLog: log,
+                foodLogDocumentId: documentId,
+              ),
             ),
           );
         },
@@ -269,7 +272,10 @@ class _FoodHistoryPageState extends State<FoodHistoryPage> {
     );
   }
 
-  Widget _listView(List<FoodLogModel> logs) {
+  Widget _listView(
+    List<FoodLogModel> logs,
+    Map<FoodLogModel, String> documentIds,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -299,14 +305,18 @@ class _FoodHistoryPageState extends State<FoodHistoryPage> {
               ),
             ),
             for (final log in logs)
-              if (log.mealType == mealType) _foodTile(log),
+              if (log.mealType == mealType)
+                _foodTile(log, documentId: documentIds[log]),
           ],
         ],
       ],
     );
   }
 
-  Widget _timelineView(List<FoodLogModel> logs) {
+  Widget _timelineView(
+    List<FoodLogModel> logs,
+    Map<FoodLogModel, String> documentIds,
+  ) {
     final sorted = [...logs]..sort((a, b) => b.loggedAt.compareTo(a.loggedAt));
 
     return Column(
@@ -322,13 +332,19 @@ class _FoodHistoryPageState extends State<FoodHistoryPage> {
               ),
             ),
           ),
-          _foodTile(log),
+          _foodTile(log, documentId: documentIds[log]),
         ],
       ],
     );
   }
 
-  Widget _historyContent(List<FoodLogModel> allLogs) {
+  Widget _historyContent(List<FoodLogRecord> records) {
+    final allLogs = records.map((record) => record.foodLog).toList();
+
+    final documentIds = <FoodLogModel, String>{
+      for (final record in records) record.foodLog: record.documentId,
+    };
+
     final dailyLogs = _logsForDate(allLogs);
     final visibleLogs = _applyFilter(dailyLogs);
 
@@ -394,9 +410,9 @@ class _FoodHistoryPageState extends State<FoodHistoryPage> {
             ),
           )
         else if (_showTimeline)
-          _timelineView(visibleLogs)
+          _timelineView(visibleLogs, documentIds)
         else
-          _listView(visibleLogs),
+          _listView(visibleLogs, documentIds),
       ],
     );
   }
@@ -416,7 +432,7 @@ class _FoodHistoryPageState extends State<FoodHistoryPage> {
           ),
         ],
       ),
-      body: FutureBuilder<List<FoodLogModel>>(
+      body: FutureBuilder<List<FoodLogRecord>>(
         future: _logsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {

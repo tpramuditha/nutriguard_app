@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../data/models/food_model.dart';
@@ -7,12 +8,14 @@ import '../../data/repositories/food_repository.dart';
 import '../widgets/food_portion_sheet.dart';
 import '../../data/models/food_log_model.dart';
 import '../../data/repositories/food_log_repository.dart';
+import '../../data/services/food_log_photo_service.dart';
 import 'manual_food_entry_page.dart';
 
 class FoodSearchPage extends StatefulWidget {
   final String? initialQuery;
+  final XFile? selectedPhoto;
 
-  const FoodSearchPage({super.key, this.initialQuery});
+  const FoodSearchPage({super.key, this.initialQuery, this.selectedPhoto});
 
   @override
   State<FoodSearchPage> createState() => _FoodSearchPageState();
@@ -24,6 +27,8 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
   final FoodRepository _foodRepository = FoodRepository();
 
   final FoodLogRepository _foodLogRepository = FoodLogRepository();
+
+  final FoodLogPhotoService _photoService = FoodLogPhotoService();
 
   bool _isSavingFood = false;
 
@@ -172,9 +177,40 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
     );
 
     try {
-      await _foodLogRepository.saveFoodLog(userId: user.uid, foodLog: foodLog);
+      final documentId = await _foodLogRepository.saveFoodLog(
+        userId: user.uid,
+        foodLog: foodLog,
+      );
+
+      bool photoSaved = true;
+
+      if (widget.selectedPhoto != null) {
+        try {
+          await _photoService.savePhoto(
+            userId: user.uid,
+            documentId: documentId,
+            photo: widget.selectedPhoto!,
+          );
+        } catch (error) {
+          photoSaved = false;
+
+          debugPrint('Food photo could not be saved: $error');
+        }
+      }
 
       if (!mounted) return;
+
+      if (!photoSaved) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Food logged successfully, but the photo '
+              'could not be saved on this device.',
+            ),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
 
       // When opened from AI recognition, return a successful save result.
       if (widget.initialQuery != null) {

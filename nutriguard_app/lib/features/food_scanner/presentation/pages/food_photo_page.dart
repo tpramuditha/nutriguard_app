@@ -212,7 +212,10 @@ class _FoodPhotoPageState extends State<FoodPhotoPage> {
         final bool? saved = await Navigator.push<bool>(
           context,
           MaterialPageRoute(
-            builder: (_) => FoodSearchPage(initialQuery: selectedFoodName),
+            builder: (_) => FoodSearchPage(
+              initialQuery: selectedFoodName,
+              selectedPhoto: _selectedImage,
+            ),
           ),
         );
 

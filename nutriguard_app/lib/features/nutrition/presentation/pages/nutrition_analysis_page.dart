@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'dart:io';
 
 import '../../../food_scanner/data/models/food_log_model.dart';
+import '../../../food_scanner/data/services/food_log_photo_service.dart';
 
 import '../widgets/nutrition_budget_card.dart';
 
 class NutritionAnalysisPage extends StatelessWidget {
   final FoodLogModel foodLog;
+  final String? foodLogDocumentId;
 
-  const NutritionAnalysisPage({super.key, required this.foodLog});
+  const NutritionAnalysisPage({
+    super.key,
+    required this.foodLog,
+    this.foodLogDocumentId,
+  });
 
   static const Color _teal = Color(0xFF009B8E);
   static const Color _dark = Color(0xFF073D58);
@@ -101,6 +110,47 @@ class NutritionAnalysisPage extends StatelessWidget {
     );
   }
 
+  Widget _buildFoodPhoto() {
+    final user = FirebaseAuth.instance.currentUser;
+    final documentId = foodLogDocumentId;
+
+    if (user == null || documentId == null || documentId.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final photoService = FoodLogPhotoService();
+
+    return FutureBuilder<String?>(
+      future: photoService.getPhotoPath(
+        userId: user.uid,
+        documentId: documentId,
+      ),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const SizedBox.shrink();
+        }
+
+        final imagePath = snapshot.data!;
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Image.file(
+              File(imagePath),
+              width: double.infinity,
+              height: 220,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final proteinEnergy = foodLog.protein * 4;
@@ -122,6 +172,7 @@ class NutritionAnalysisPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          _buildFoodPhoto(),
           // Food information card
 
           _card(
