@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../food_scanner/data/models/food_log_model.dart';
 import '../../../food_scanner/data/repositories/food_log_repository.dart';
 import '../../data/repositories/nutrition_goal_repository.dart';
+import '../../domain/services/nutrition_budget_calculator.dart';
 
 class NutritionBudgetCard extends StatefulWidget {
   final FoodLogModel foodLog;
@@ -25,6 +26,8 @@ class _BudgetData {
 }
 
 class _NutritionBudgetCardState extends State<NutritionBudgetCard> {
+  final NutritionBudgetCalculator _budgetCalculator =
+      NutritionBudgetCalculator();
   final NutritionGoalRepository _goalRepository = NutritionGoalRepository();
 
   final FoodLogRepository _foodLogRepository = FoodLogRepository();
@@ -118,15 +121,16 @@ class _NutritionBudgetCardState extends State<NutritionBudgetCard> {
 
         final data = snapshot.data!;
 
-        final target = data.targetCalories.toDouble();
-        final consumed = data.consumedCalories;
-        final remaining = target - consumed;
+        final budget = _budgetCalculator.calculate(
+          targetCalories: data.targetCalories,
+          consumedCalories: data.consumedCalories,
+          selectedFoodCalories: widget.foodLog.calories,
+        );
 
-        final progress = target > 0 ? (consumed / target).clamp(0.0, 1.0) : 0.0;
-
-        final foodPercentage = target > 0
-            ? (widget.foodLog.calories / target * 100)
-            : 0.0;
+        final consumed = budget.consumedCalories;
+        final remaining = budget.remainingCalories;
+        final progress = budget.progress;
+        final foodPercentage = budget.selectedFoodPercentage;
 
         final selectedDate = widget.foodLog.loggedAt.toLocal();
 
