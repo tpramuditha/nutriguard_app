@@ -352,6 +352,99 @@ function uniqueMarkerNames(items) {
       allow delete: if false;
     }
 
+    
+    // NutriGuard My Pantry
+    match /users/{userId}/pantryItems/{itemId} {
+
+      function isPantryOwner() {
+        return request.auth != null
+          && request.auth.uid == userId;
+      }
+
+      
+      function validPantryItem() {
+        let data = request.resource.data;
+
+        return data.keys().hasAll([
+            'name',
+            'quantity',
+            'unit',
+            'category',
+            'expiryDate',
+            'createdAt'
+          ])
+          && data.keys().hasOnly([
+            'name',
+            'quantity',
+            'unit',
+            'category',
+            'expiryDate',
+            'createdAt',
+            'lowStockThreshold'
+          ])
+
+          // Ingredient name
+          && data.name is string
+          && data.name.size() > 0
+          && data.name.size() <= 100
+          && data.name.matches('.*[^ ].*')
+
+          // Positive quantity
+          && data.quantity is number
+          && data.quantity > 0
+          && data.quantity <= 1000000
+
+          // Measurement unit
+          && data.unit is string
+          && data.unit.size() > 0
+          && data.unit.size() <= 30
+          && data.unit.matches('.*[^ ].*')
+
+          // Ingredient category
+          && data.category is string
+          && data.category.size() > 0
+          && data.category.size() <= 60
+          && data.category.matches('.*[^ ].*')
+
+          // Optional expiry date
+          && (
+            data.expiryDate == null
+            || data.expiryDate is timestamp
+          )
+
+          // Creation timestamp
+          && data.createdAt is timestamp
+
+          // Optional low-stock threshold
+          && (
+            !data.keys().hasAny(['lowStockThreshold'])
+            || (
+              data.lowStockThreshold is number
+              && data.lowStockThreshold >= 0
+              && data.lowStockThreshold <= 1000000
+            )
+          );
+      }
+
+
+      // Only the authenticated owner can read pantry items.
+      allow read: if isPantryOwner();
+
+      // Only valid pantry items can be created.
+      allow create: if isPantryOwner()
+        && validPantryItem();
+
+      // Allow editing, but keep createdAt unchanged.
+      allow update: if isPantryOwner()
+        && validPantryItem()
+        && request.resource.data.createdAt
+          == resource.data.createdAt;
+
+      // Only the owner can delete pantry items.
+      allow delete: if isPantryOwner();
+    }
+
+
 
   }
 }

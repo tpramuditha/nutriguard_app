@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/routes/route_names.dart';
+import '../../../pantry/presentation/pages/pantry_page.dart';
 
 class QuickActions extends StatelessWidget {
   const QuickActions({super.key});
@@ -52,20 +53,26 @@ class QuickActions extends StatelessWidget {
     return Expanded(
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-
         onTap: () {
-          // Navigate to Health Profile
+          // Open My Pantry.
+          if (title == 'Pantry') {
+            Navigator.of(
+              context,
+            ).push(MaterialPageRoute<void>(builder: (_) => const PantryPage()));
+            return;
+          }
+
+          // Navigate to Health Profile.
           if (title == 'Health') {
             Navigator.pushNamed(context, RouteNames.health);
             return;
           }
 
-          // Other quick actions are not implemented yet
+          // Other quick actions are not implemented yet.
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text('$title page is coming soon')));
         },
-
         child: Column(
           children: [
             Container(

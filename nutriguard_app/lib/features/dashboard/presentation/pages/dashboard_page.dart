@@ -142,7 +142,7 @@ class _DashboardPageState extends State<DashboardPage> {
       return;
     }
 
-    // Other pages are not implemented yet
+    // Other pages are not implemented yet.
     const pages = ['Home', 'Scanner', 'Planner', 'Progress', 'Profile'];
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -201,7 +201,7 @@ class _DashboardPageState extends State<DashboardPage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Header with Firebase username
+            // Header with Firebase username.
             const DashboardHeader(),
 
             const SizedBox(height: 24),
@@ -317,12 +317,12 @@ class _DashboardPageState extends State<DashboardPage> {
 
             const SizedBox(height: 28),
 
-            // Quick access to main features
+            // Existing Quick Actions.
             const QuickActions(),
 
             const SizedBox(height: 24),
 
-            // Today's Meals
+            // Today's Meals.
             TodayMealsCard(key: ValueKey(_mealsRefreshVersion)),
 
             const SizedBox(height: 24),
