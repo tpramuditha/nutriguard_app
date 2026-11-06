@@ -85,7 +85,13 @@ class PantryRepository {
       throw ArgumentError('A pantry document ID is required for updates.');
     }
 
-    await _pantryItems(userId).doc(item.id).update(item.toMap());
+    final updateData = item.toMap();
+
+    if (item.lowStockThreshold == null) {
+      updateData['lowStockThreshold'] = FieldValue.delete();
+    }
+
+    await _pantryItems(userId).doc(item.id).update(updateData);
   }
 
   // DELETE: Remove an ingredient.

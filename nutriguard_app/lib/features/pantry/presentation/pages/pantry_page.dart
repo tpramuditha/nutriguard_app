@@ -5,6 +5,7 @@ import '../../data/models/pantry_item_model.dart';
 import '../../data/repositories/pantry_repository.dart';
 import 'add_pantry_item_page.dart';
 import 'edit_pantry_item_page.dart';
+import 'recipes_page.dart';
 
 class PantryPage extends StatefulWidget {
   const PantryPage({super.key});
@@ -81,12 +82,6 @@ class _PantryPageState extends State<PantryPage> {
         SnackBar(content: Text('Unable to delete ingredient: $error')),
       );
     }
-  }
-
-  void _showComingSoon(String feature) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('$feature will be available soon.')));
   }
 
   // REAL low-stock logic from PantryItemModel.
@@ -322,7 +317,9 @@ class _PantryPageState extends State<PantryPage> {
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: () {
-                _showComingSoon('Recipe Suggestions');
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => const RecipesPage()),
+                );
               },
               icon: const Icon(Icons.auto_awesome),
               label: const Text('Suggest Recipes'),
