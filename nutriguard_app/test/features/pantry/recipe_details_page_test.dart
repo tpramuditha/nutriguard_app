@@ -104,11 +104,18 @@ void main() {
     testWidgets('displays ingredient availability count', (tester) async {
       await pumpDetailsPage(tester, createResult());
 
+      await tester.scrollUntilVisible(
+        find.text('2 of 3 ingredients available'),
+        200,
+      );
+
       expect(find.text('2 of 3 ingredients available'), findsOneWidget);
     });
 
     testWidgets('shows available ingredient information', (tester) async {
       await pumpDetailsPage(tester, createResult());
+
+      await tester.scrollUntilVisible(find.text('Rice'), 200);
 
       expect(find.text('Rice'), findsOneWidget);
       expect(find.text('Eggs'), findsOneWidget);
@@ -142,6 +149,12 @@ void main() {
       await pumpDetailsPage(tester, createResult(includeCarrots: true));
 
       expect(find.text('100% match'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.text('3 of 3 ingredients available'),
+        200,
+      );
+
       expect(find.text('3 of 3 ingredients available'), findsOneWidget);
     });
 
@@ -149,6 +162,38 @@ void main() {
       await pumpDetailsPage(tester, createResult());
 
       expect(find.text('67% match'), findsOneWidget);
+    });
+
+    testWidgets('shows per-serving nutrition label and values', (tester) async {
+      await pumpDetailsPage(tester, createResult());
+
+      expect(find.text('Values shown per serving'), findsOneWidget);
+
+      expect(find.text('350 kcal'), findsOneWidget);
+      expect(find.text('15 g'), findsOneWidget);
+      expect(find.text('45 g'), findsOneWidget);
+      expect(find.text('10 g'), findsOneWidget);
+    });
+
+    testWidgets('shows full recipe nutrition totals', (tester) async {
+      await pumpDetailsPage(tester, createResult());
+
+      await tester.scrollUntilVisible(find.text('Full Recipe Nutrition'), 200);
+
+      expect(find.text('Full Recipe Nutrition'), findsOneWidget);
+
+      expect(find.text('Total Servings'), findsOneWidget);
+      expect(find.text('Total Calories'), findsOneWidget);
+      expect(find.text('700 kcal'), findsOneWidget);
+
+      expect(find.text('Total Protein'), findsOneWidget);
+      expect(find.text('30 g'), findsOneWidget);
+
+      expect(find.text('Total Carbs'), findsOneWidget);
+      expect(find.text('90 g'), findsOneWidget);
+
+      expect(find.text('Total Fat'), findsOneWidget);
+      expect(find.text('20 g'), findsOneWidget);
     });
   });
 }

@@ -194,6 +194,7 @@ class _HealthProfilePageState extends State<HealthProfilePage> {
                           final saved = await Navigator.pushNamed(
                             context,
                             RouteNames.logHealthMarker,
+                            arguments: _selectedMonth,
                           );
 
                           if (!mounted) return;

@@ -133,13 +133,26 @@ class RecipeDetailsPage extends StatelessWidget {
             color: darkGreen,
           ),
         ),
+        const SizedBox(height: 6),
+        const Row(
+          children: [
+            Icon(Icons.info_outline, color: Color(0xFF69868B), size: 15),
+            SizedBox(width: 6),
+            Text(
+              'Values shown per serving',
+              style: TextStyle(color: Color(0xFF69868B), fontSize: 12),
+            ),
+          ],
+        ),
         const SizedBox(height: 12),
+
+        // Per-serving nutrition information.
         Row(
           children: [
             Expanded(
               child: _nutritionCard(
                 'Calories',
-                '${_formatQuantity(recipe.calories)} kcal',
+                '${_formatQuantity(recipe.caloriesPerServing)} kcal',
                 Icons.local_fire_department_outlined,
               ),
             ),
@@ -147,7 +160,7 @@ class RecipeDetailsPage extends StatelessWidget {
             Expanded(
               child: _nutritionCard(
                 'Protein',
-                '${_formatQuantity(recipe.protein)} g',
+                '${_formatQuantity(recipe.proteinPerServing)} g',
                 Icons.fitness_center_outlined,
               ),
             ),
@@ -159,7 +172,7 @@ class RecipeDetailsPage extends StatelessWidget {
             Expanded(
               child: _nutritionCard(
                 'Carbs',
-                '${_formatQuantity(recipe.carbs)} g',
+                '${_formatQuantity(recipe.carbsPerServing)} g',
                 Icons.grain,
               ),
             ),
@@ -167,11 +180,122 @@ class RecipeDetailsPage extends StatelessWidget {
             Expanded(
               child: _nutritionCard(
                 'Fat',
-                '${_formatQuantity(recipe.fat)} g',
+                '${_formatQuantity(recipe.fatPerServing)} g',
                 Icons.water_drop_outlined,
               ),
             ),
           ],
+        ),
+
+        const SizedBox(height: 14),
+
+        // Nutrition information for the entire recipe.
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEDF8F5),
+            borderRadius: BorderRadius.circular(13),
+            border: Border.all(color: const Color(0xFFD4EAE3)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.restaurant_menu, color: primary, size: 19),
+                  SizedBox(width: 8),
+                  Text(
+                    'Full Recipe Nutrition',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: darkGreen,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Total Servings'),
+                  Text(
+                    '${recipe.servings}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: darkGreen,
+                    ),
+                  ),
+                ],
+              ),
+
+              const Divider(height: 20),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Total Calories'),
+                  Text(
+                    '${_formatQuantity(recipe.totalRecipeCalories)} kcal',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: darkGreen,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 8),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Total Protein'),
+                  Text(
+                    '${_formatQuantity(recipe.totalRecipeProtein)} g',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: darkGreen,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 8),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Total Carbs'),
+                  Text(
+                    '${_formatQuantity(recipe.totalRecipeCarbs)} g',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: darkGreen,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 8),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Total Fat'),
+                  Text(
+                    '${_formatQuantity(recipe.totalRecipeFat)} g',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: darkGreen,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ],
     );

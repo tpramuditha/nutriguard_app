@@ -1,11 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../../nutrition/data/models/nutrition_goal_model.dart';
 import '../../data/catalog/recipe_catalog.dart';
 import '../../data/models/pantry_item_model.dart';
 import '../../data/repositories/pantry_repository.dart';
+import '../../data/services/recipe_goal_ranking_service.dart';
 import '../../data/services/recipe_matching_service.dart';
+import '../../data/services/recipe_nutrition_goal_loader.dart';
 import 'recipe_details_page.dart';
+import '../widgets/recipe_health_context_card.dart';
 
 class RecipesPage extends StatefulWidget {
   const RecipesPage({super.key});
@@ -19,21 +23,67 @@ class _RecipesPageState extends State<RecipesPage> {
   static const Color darkGreen = Color(0xFF086F67);
   static const Color background = Color(0xFFF7FAFA);
 
-  final PantryRepository _repository = PantryRepository();
+  final PantryRepository _pantryRepository = PantryRepository();
+
+  final RecipeNutritionGoalLoader _goalLoader = RecipeNutritionGoalLoader();
+
   final RecipeMatchingService _matchingService = const RecipeMatchingService();
+
+  final RecipeGoalRankingService _rankingService =
+      const RecipeGoalRankingService();
 
   String _selectedFilter = 'All Recipes';
 
-  List<RecipeMatchResult> _getFilteredRecipes(List<RecipeMatchResult> recipes) {
+  String? _loadedUserId;
+  Future<NutritionGoalModel>? _goalFuture;
+  Stream<List<PantryItemModel>>? _pantryStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeForCurrentUser();
+  }
+
+  void _initializeForCurrentUser() {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+
+    if (userId == _loadedUserId) return;
+
+    _loadedUserId = userId;
+
+    if (userId == null) {
+      _goalFuture = null;
+      _pantryStream = null;
+      return;
+    }
+
+    _goalFuture = _goalLoader.loadGoal(userId: userId);
+
+    _pantryStream = _pantryRepository.watchPantryItems(userId: userId);
+  }
+
+  void _retryGoalLoading() {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) return;
+
+    setState(() {
+      _loadedUserId = userId;
+      _goalFuture = _goalLoader.loadGoal(userId: userId);
+    });
+  }
+
+  List<PersonalizedRecipeResult> _filterRecipes(
+    List<PersonalizedRecipeResult> results,
+  ) {
     switch (_selectedFilter) {
       case 'Ready to Cook':
-        return recipes.where((result) => result.isReadyToCook).toList();
+        return results.where((r) => r.isReadyToCook).toList();
 
       case 'Missing a Few':
-        return recipes.where((result) => result.isMissingAFew).toList();
+        return results.where((r) => r.matchResult.isMissingAFew).toList();
 
       default:
-        return recipes;
+        return results;
     }
   }
 
@@ -54,12 +104,8 @@ class _RecipesPageState extends State<RecipesPage> {
     }
   }
 
-  String _formatPercentage(double percentage) {
-    return '${percentage.round()}%';
-  }
-
-  Widget _buildHeader(List<RecipeMatchResult> results) {
-    final readyCount = results.where((result) => result.isReadyToCook).length;
+  Widget _buildHeader(List<PersonalizedRecipeResult> results) {
+    final readyCount = results.where((r) => r.isReadyToCook).length;
 
     return Container(
       width: double.infinity,
@@ -75,7 +121,7 @@ class _RecipesPageState extends State<RecipesPage> {
         children: [
           const Row(
             children: [
-              Icon(Icons.auto_awesome, color: Colors.white, size: 24),
+              Icon(Icons.auto_awesome, color: Colors.white),
               SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -91,11 +137,11 @@ class _RecipesPageState extends State<RecipesPage> {
           ),
           const SizedBox(height: 10),
           Text(
-            'Explore ${results.length} recipes using '
-            'ingredients from your pantry.',
+            'Explore ${results.length} recipes '
+            'using ingredients from your pantry.',
             style: const TextStyle(color: Colors.white, fontSize: 13),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
             decoration: BoxDecoration(
@@ -126,39 +172,135 @@ class _RecipesPageState extends State<RecipesPage> {
     );
   }
 
-  Widget _buildFilters(List<RecipeMatchResult> results) {
-    final readyCount = results.where((result) => result.isReadyToCook).length;
+  Widget _buildNutritionGoalCard(NutritionGoalModel goal) {
+    final mealGuide = _rankingService.estimatedMealCalorieGuide(goal);
 
-    final missingFewCount = results
-        .where((result) => result.isMissingAFew)
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: const Color(0xFFDCEAE7)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.track_changes, color: primary),
+              SizedBox(width: 8),
+              Text(
+                'Your Nutrition Goal',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: darkGreen,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _goalValue(
+                  'Daily Target',
+                  '${goal.dailyCalorieTarget} kcal',
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _goalValue('Meal Guide', '${mealGuide.round()} kcal'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Goal: ${goal.goalType}',
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              color: darkGreen,
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'The meal guide is an illustrative one-third '
+            'of your daily target, not a prescribed '
+            'meal allocation.',
+            style: TextStyle(
+              fontSize: 11,
+              height: 1.4,
+              color: Color(0xFF72878A),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _goalValue(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.all(11),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEDF8F5),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(color: Color(0xFF69868B), fontSize: 11),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            value,
+            style: const TextStyle(
+              color: darkGreen,
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilters(List<PersonalizedRecipeResult> results) {
+    final readyCount = results.where((r) => r.isReadyToCook).length;
+
+    final missingCount = results
+        .where((r) => r.matchResult.isMissingAFew)
         .length;
 
     final filters = <String, int>{
       'All Recipes': results.length,
       'Ready to Cook': readyCount,
-      'Missing a Few': missingFewCount,
+      'Missing a Few': missingCount,
     };
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: filters.entries.map((entry) {
-          final isSelected = _selectedFilter == entry.key;
+          final selected = _selectedFilter == entry.key;
 
           return Padding(
             padding: const EdgeInsets.only(right: 8),
             child: ChoiceChip(
-              showCheckmark: false,
               label: Text('${entry.key} (${entry.value})'),
-              selected: isSelected,
+              selected: selected,
+              showCheckmark: false,
               selectedColor: primary,
               backgroundColor: Colors.white,
+              side: const BorderSide(color: Color(0xFFD8E8E6)),
               labelStyle: TextStyle(
-                color: isSelected ? Colors.white : darkGreen,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: selected ? Colors.white : darkGreen,
+                fontWeight: selected ? FontWeight.bold : FontWeight.w500,
                 fontSize: 12,
               ),
-              side: const BorderSide(color: Color(0xFFD8E8E6)),
               onSelected: (_) {
                 setState(() {
                   _selectedFilter = entry.key;
@@ -172,34 +314,30 @@ class _RecipesPageState extends State<RecipesPage> {
   }
 
   Widget _buildStatusBadge(RecipeMatchResult result) {
-    final isReady = result.isReadyToCook;
+    final ready = result.isReadyToCook;
 
-    final label = isReady
+    final label = ready
         ? 'Ready to Cook'
         : result.isMissingAFew
         ? 'Missing a Few'
         : 'Need More Ingredients';
 
-    final badgeColor = isReady
-        ? const Color(0xFF18865A)
-        : const Color(0xFFD98319);
+    final textColor = ready ? const Color(0xFF18865A) : const Color(0xFFD98319);
 
-    final badgeBackground = isReady
-        ? const Color(0xFFE3F6E9)
-        : const Color(0xFFFFF0DD);
+    final fillColor = ready ? const Color(0xFFE3F6E9) : const Color(0xFFFFF0DD);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
       decoration: BoxDecoration(
-        color: badgeBackground,
+        color: fillColor,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            isReady ? Icons.check_circle_outline : Icons.info_outline,
-            color: badgeColor,
+            ready ? Icons.check_circle_outline : Icons.info_outline,
+            color: textColor,
             size: 14,
           ),
           const SizedBox(width: 5),
@@ -207,7 +345,7 @@ class _RecipesPageState extends State<RecipesPage> {
             child: Text(
               label,
               style: TextStyle(
-                color: badgeColor,
+                color: textColor,
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
               ),
@@ -218,144 +356,169 @@ class _RecipesPageState extends State<RecipesPage> {
     );
   }
 
-  Widget _buildRecipeCard(RecipeMatchResult result) {
-    final recipe = result.recipe;
+  Widget _buildRecipeCard(PersonalizedRecipeResult personalized) {
+    final match = personalized.matchResult;
+    final recipe = match.recipe;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 13),
+      padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5EEEE)),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(13),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 86,
-                  width: 86,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFDDF6E9), Color(0xFFFFEBCD)],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                height: 86,
+                width: 86,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFDDF6E9), Color(0xFFFFEBCD)],
+                  ),
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: Icon(_recipeIcon(recipe.id), color: primary, size: 39),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      recipe.name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF183F43),
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(13),
-                  ),
-                  child: Icon(_recipeIcon(recipe.id), color: primary, size: 39),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        recipe.name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF183F43),
-                        ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '${recipe.totalMinutes} min  •  '
+                      '${recipe.servings} '
+                      '${recipe.servings == 1 ? 'serving' : 'servings'}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF71858A),
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        '${recipe.totalMinutes} min  •  '
-                        '${recipe.servings} '
-                        '${recipe.servings == 1 ? 'serving' : 'servings'}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF71858A),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      _buildStatusBadge(result),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 8),
+                    _buildStatusBadge(match),
+                  ],
                 ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            recipe.description,
+            style: const TextStyle(fontSize: 12, color: Color(0xFF617B80)),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${match.matchedIngredients}/'
+                '${match.totalIngredients} ingredients',
+                style: const TextStyle(
+                  color: darkGreen,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                '${match.matchPercentage.round()}% match',
+                style: const TextStyle(
+                  color: darkGreen,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: match.matchPercentage / 100,
+              minHeight: 7,
+              backgroundColor: const Color(0xFFE4EFED),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                match.isReadyToCook ? primary : const Color(0xFFE6A34B),
+              ),
             ),
-            const SizedBox(height: 12),
+          ),
+          if (!match.isReadyToCook) ...[
+            const SizedBox(height: 9),
             Text(
-              recipe.description,
-              style: const TextStyle(fontSize: 12, color: Color(0xFF617B80)),
+              '${match.unavailableIngredients.length} '
+              'ingredient(s) missing or insufficient',
+              style: const TextStyle(fontSize: 11, color: Color(0xFFB47625)),
             ),
-            const SizedBox(height: 13),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${result.matchedIngredients}/'
-                  '${result.totalIngredients} ingredients',
+          ],
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              const Icon(
+                Icons.local_fire_department_outlined,
+                size: 17,
+                color: primary,
+              ),
+              const SizedBox(width: 5),
+              Expanded(
+                child: Text(
+                  '${recipe.calories.round()} kcal estimate',
                   style: const TextStyle(
-                    color: darkGreen,
                     fontSize: 12,
+                    color: darkGreen,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                Text(
-                  '${_formatPercentage(result.matchPercentage)} match',
-                  style: const TextStyle(
-                    color: darkGreen,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: LinearProgressIndicator(
-                value: result.matchPercentage / 100,
-                minHeight: 7,
-                backgroundColor: const Color(0xFFE4EFED),
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  result.isReadyToCook ? primary : const Color(0xFFE6A34B),
-                ),
-              ),
-            ),
-            if (!result.isReadyToCook) ...[
-              const SizedBox(height: 10),
-              Text(
-                '${result.unavailableIngredients.length} '
-                'ingredient(s) missing or insufficient',
-                style: const TextStyle(fontSize: 11, color: Color(0xFFB47625)),
               ),
             ],
-            const SizedBox(height: 13),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => RecipeDetailsPage(result: result),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.menu_book_outlined, size: 18),
-                label: const Text('View Recipe'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: primary,
-                  side: const BorderSide(color: primary),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            personalized.calorieInsight,
+            style: const TextStyle(fontSize: 11, color: Color(0xFF71858A)),
+          ),
+          const SizedBox(height: 13),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => RecipeDetailsPage(result: match),
                   ),
+                );
+              },
+              icon: const Icon(Icons.menu_book_outlined, size: 18),
+              label: const Text('View Recipe'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: primary,
+                side: const BorderSide(color: primary),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildEmptyState() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 15),
+      padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 12),
       child: Column(
         children: [
           const Icon(Icons.no_food_outlined, size: 55, color: primary),
@@ -366,7 +529,7 @@ class _RecipesPageState extends State<RecipesPage> {
           ),
           const SizedBox(height: 8),
           const Text(
-            'Try a different filter or add more '
+            'Try another filter or add more '
             'ingredients to your pantry.',
             textAlign: TextAlign.center,
           ),
@@ -384,20 +547,32 @@ class _RecipesPageState extends State<RecipesPage> {
     );
   }
 
-  Widget _buildContent(List<PantryItemModel> pantryItems) {
-    final allResults = _matchingService.matchRecipes(
+  Widget _buildContent(
+    List<PantryItemModel> pantryItems,
+    NutritionGoalModel nutritionGoal,
+  ) {
+    final matches = _matchingService.matchRecipes(
       recipes: RecipeCatalog.getAllRecipes(),
       pantryItems: pantryItems,
     );
 
-    final filteredResults = _getFilteredRecipes(allResults);
+    final rankedResults = _rankingService.rankRecipes(
+      recipeMatches: matches,
+      nutritionGoal: nutritionGoal,
+    );
+
+    final filteredResults = _filterRecipes(rankedResults);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
       children: [
-        _buildHeader(allResults),
+        _buildHeader(rankedResults),
+        const SizedBox(height: 14),
+        _buildNutritionGoalCard(nutritionGoal),
+        const SizedBox(height: 14),
+        const RecipeHealthContextCard(),
         const SizedBox(height: 18),
-        _buildFilters(allResults),
+        _buildFilters(rankedResults),
         const SizedBox(height: 16),
         Text(
           _selectedFilter,
@@ -412,20 +587,49 @@ class _RecipesPageState extends State<RecipesPage> {
           _buildEmptyState()
         else
           for (final result in filteredResults) _buildRecipeCard(result),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         const Text(
-          'Recipe availability is based on your pantry '
-          'stock. Nutrition values are estimates.',
+          'Recipe calories are illustrative estimates. '
+          'The calorie guide is not a medical recommendation. '
+          'Recipe availability depends on pantry stock.',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 11, color: Color(0xFF7B9094)),
+          style: TextStyle(color: Color(0xFF7B9094), fontSize: 11),
         ),
       ],
+    );
+  }
+
+  Widget _buildError(String message, {VoidCallback? retry}) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, color: Colors.orange, size: 42),
+            const SizedBox(height: 12),
+            Text(message, textAlign: TextAlign.center),
+            if (retry != null) ...[
+              const SizedBox(height: 14),
+              OutlinedButton.icon(
+                onPressed: retry,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Retry'),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+
+    if (user?.uid != _loadedUserId) {
+      _initializeForCurrentUser();
+    }
 
     return Scaffold(
       backgroundColor: background,
@@ -437,34 +641,58 @@ class _RecipesPageState extends State<RecipesPage> {
           'Recipes You Can Make',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
+        actions: [
+          if (user != null)
+            IconButton(
+              tooltip: 'Refresh nutrition goal',
+              onPressed: _retryGoalLoading,
+              icon: const Icon(Icons.refresh),
+            ),
+        ],
       ),
       body: user == null
           ? const Center(
               child: Text('Please log in to view recipe suggestions.'),
             )
-          : StreamBuilder<List<PantryItemModel>>(
-              stream: _repository.watchPantryItems(userId: user.uid),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Text(
-                        'Unable to load pantry ingredients: '
-                        '${snapshot.error}',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
+          : FutureBuilder<NutritionGoalModel>(
+              future: _goalFuture,
+              builder: (context, goalSnapshot) {
+                if (goalSnapshot.hasError) {
+                  return _buildError(
+                    'Unable to load your nutrition goal. '
+                    'Please check your connection.',
+                    retry: _retryGoalLoading,
                   );
                 }
 
-                if (!snapshot.hasData) {
+                if (!goalSnapshot.hasData) {
                   return const Center(
                     child: CircularProgressIndicator(color: primary),
                   );
                 }
 
-                return _buildContent(snapshot.data!);
+                return StreamBuilder<List<PantryItemModel>>(
+                  stream: _pantryStream,
+                  builder: (context, pantrySnapshot) {
+                    if (pantrySnapshot.hasError) {
+                      return _buildError(
+                        'Unable to load pantry ingredients. '
+                        'Please check your connection.',
+                      );
+                    }
+
+                    if (!pantrySnapshot.hasData) {
+                      return const Center(
+                        child: CircularProgressIndicator(color: primary),
+                      );
+                    }
+
+                    return _buildContent(
+                      pantrySnapshot.data!,
+                      goalSnapshot.data!,
+                    );
+                  },
+                );
               },
             ),
     );
