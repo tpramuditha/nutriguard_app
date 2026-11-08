@@ -8,6 +8,7 @@ import '../../../pantry/data/repositories/pantry_repository.dart';
 import '../../../pantry/data/services/recipe_goal_ranking_service.dart';
 import '../../../pantry/data/services/recipe_nutrition_goal_loader.dart';
 import '../../../pantry/presentation/pages/recipe_details_page.dart';
+import '../../../planner/presentation/pages/daily_meal_planner_page.dart';
 import '../../data/services/meal_recommendation_service.dart';
 import '../widgets/meal_type_selector.dart';
 
@@ -357,6 +358,30 @@ class _MealRecommendationPageState extends State<MealRecommendationPage> {
               },
               icon: const Icon(Icons.menu_book_outlined, size: 18),
               label: const Text('View Recipe'),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => DailyMealPlannerPage(
+                      initialMealType: _selectedMeal,
+                      initialRecipeId: recipe.id,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.calendar_month_outlined, size: 18),
+              label: const Text('Add to Planner'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary),
+              ),
             ),
           ),
         ],

@@ -142,6 +142,11 @@ class _DashboardPageState extends State<DashboardPage> {
       return;
     }
 
+    if (index == 2) {
+      Navigator.pushNamed(context, RouteNames.planner);
+      return;
+    }
+
     // Other pages are not implemented yet.
     const pages = ['Home', 'Scanner', 'Planner', 'Progress', 'Profile'];
 

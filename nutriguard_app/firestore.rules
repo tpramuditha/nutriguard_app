@@ -444,6 +444,63 @@ function uniqueMarkerNames(items) {
       allow delete: if isPantryOwner();
     }
 
+    
+    // NutriGuard Meal Planner
+    match /users/{userId}/plannedMeals/{mealId} {
+
+      function isMealOwner() {
+        return request.auth != null
+          && request.auth.uid == userId;
+      }
+
+      function validPlannedMeal() {
+        let data = request.resource.data;
+
+        return data.keys().hasAll([
+          'id',
+          'date',
+          'mealType',
+          'recipeId',
+          'servings'
+        ])
+        && data.keys().hasOnly([
+          'id',
+          'date',
+          'mealType',
+          'recipeId',
+          'servings'
+        ])
+        && data.id is string
+        && data.id == mealId
+        && data.date is string
+        && data.date.matches(
+          '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        )
+        && data.mealType is string
+        && data.mealType in [
+          'Breakfast',
+          'Lunch',
+          'Dinner',
+          'Snack'
+        ]
+        && data.recipeId is string
+        && data.recipeId.size() > 0
+        && data.recipeId.size() <= 100
+        && data.recipeId.matches('.*[^ ].*')
+        && data.servings is int
+        && data.servings >= 1
+        && data.servings <= 20;
+      }
+
+      allow read: if isMealOwner();
+
+      allow create, update: if isMealOwner()
+        && validPlannedMeal();
+
+      allow delete: if isMealOwner();
+    }
+
+
 
 
   }
