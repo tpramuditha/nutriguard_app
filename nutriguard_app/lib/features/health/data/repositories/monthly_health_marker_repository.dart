@@ -84,4 +84,39 @@ class MonthlyHealthMarkerRepository {
 
     return MonthlyHealthMarkerModel.fromMap(document.data()!);
   }
+
+  Future<List<MonthlyHealthMarkerModel>> getMarkersForRange({
+    required DateTime startMonth,
+    required DateTime endMonth,
+  }) async {
+    final start = DateTime(startMonth.year, startMonth.month);
+
+    final end = DateTime(endMonth.year, endMonth.month);
+
+    if (end.isBefore(start)) {
+      throw ArgumentError('End month cannot be before start month.');
+    }
+
+    final monthIds = <String>[];
+
+    var current = start;
+
+    while (!current.isAfter(end)) {
+      final monthId =
+          '${current.year}-'
+          '${current.month.toString().padLeft(2, '0')}';
+
+      monthIds.add(monthId);
+
+      current = DateTime(current.year, current.month + 1);
+    }
+
+    // Reuse the existing authenticated Firestore method.
+    final results = await Future.wait(
+      monthIds.map((monthId) => getMarkers(monthId)),
+    );
+
+    // Months without saved records are excluded.
+    return results.whereType<MonthlyHealthMarkerModel>().toList();
+  }
 }

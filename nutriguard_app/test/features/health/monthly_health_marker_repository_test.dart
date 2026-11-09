@@ -275,4 +275,135 @@ void main() {
       throwsA(isA<ArgumentError>()),
     );
   });
+
+  group('Historical Health Marker Range Tests', () {
+    Future<void> saveTestMonth({
+      required String month,
+      required double cholesterol,
+    }) async {
+      await repository.saveMarkers(
+        MonthlyHealthMarkerModel(
+          month: month,
+          measurements: [
+            HealthMeasurementModel(
+              name: 'Total Cholesterol',
+              value: cholesterol,
+              unit: 'mg/dL',
+            ),
+          ],
+        ),
+      );
+    }
+
+    test('loads health markers from multiple months', () async {
+      await saveTestMonth(month: '2026-09', cholesterol: 210);
+
+      await saveTestMonth(month: '2026-10', cholesterol: 195);
+
+      await saveTestMonth(month: '2026-11', cholesterol: 180);
+
+      final result = await repository.getMarkersForRange(
+        startMonth: DateTime(2026, 9),
+        endMonth: DateTime(2026, 11),
+      );
+
+      expect(result.length, 3);
+
+      expect(result.map((record) => record.month).toList(), [
+        '2026-09',
+        '2026-10',
+        '2026-11',
+      ]);
+    });
+
+    test('returns months in chronological order', () async {
+      // Save records in reverse order.
+      await saveTestMonth(month: '2026-11', cholesterol: 180);
+
+      await saveTestMonth(month: '2026-09', cholesterol: 210);
+
+      await saveTestMonth(month: '2026-10', cholesterol: 195);
+
+      final result = await repository.getMarkersForRange(
+        startMonth: DateTime(2026, 9),
+        endMonth: DateTime(2026, 11),
+      );
+
+      expect(result.map((record) => record.month).toList(), [
+        '2026-09',
+        '2026-10',
+        '2026-11',
+      ]);
+
+      expect(result.map((record) => record.measurements.first.value).toList(), [
+        210,
+        195,
+        180,
+      ]);
+    });
+
+    test('skips months without saved measurements', () async {
+      await saveTestMonth(month: '2026-09', cholesterol: 210);
+
+      await saveTestMonth(month: '2026-11', cholesterol: 180);
+
+      final result = await repository.getMarkersForRange(
+        startMonth: DateTime(2026, 9),
+        endMonth: DateTime(2026, 11),
+      );
+
+      expect(result.length, 2);
+
+      expect(result.map((record) => record.month).toList(), [
+        '2026-09',
+        '2026-11',
+      ]);
+    });
+
+    test('supports a single-month range', () async {
+      await saveTestMonth(month: '2026-10', cholesterol: 195);
+
+      final result = await repository.getMarkersForRange(
+        startMonth: DateTime(2026, 10),
+        endMonth: DateTime(2026, 10),
+      );
+
+      expect(result.length, 1);
+      expect(result.first.month, '2026-10');
+      expect(result.first.measurements.first.value, 195);
+    });
+
+    test('returns empty list when range has no records', () async {
+      final result = await repository.getMarkersForRange(
+        startMonth: DateTime(2026, 6),
+        endMonth: DateTime(2026, 8),
+      );
+
+      expect(result, isEmpty);
+    });
+
+    test('rejects an invalid month range', () async {
+      await expectLater(
+        repository.getMarkersForRange(
+          startMonth: DateTime(2026, 11),
+          endMonth: DateTime(2026, 9),
+        ),
+        throwsArgumentError,
+      );
+    });
+
+    test('does not load another user health markers', () async {
+      await saveTestMonth(month: '2026-10', cholesterol: 195);
+
+      // Simulate a different authenticated user.
+      when(() => user.uid).thenReturn('userB');
+
+      final result = await repository.getMarkersForRange(
+        startMonth: DateTime(2026, 10),
+        endMonth: DateTime(2026, 10),
+      );
+
+      expect(result, isEmpty);
+    });
+  });
 }

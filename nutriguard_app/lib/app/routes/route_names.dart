@@ -11,6 +11,7 @@ class RouteNames {
   static const String health = '/health';
   static const String pantry = '/pantry';
   static const String exercise = '/exercise';
+  static const String weightHistory = '/weight-history';
   static const String progress = '/progress';
   static const String profile = '/profile';
   static const String logHealthMarker = '/log-health-marker';

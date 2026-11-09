@@ -14,6 +14,9 @@ import '../../features/health/presentation/pages/scan_health_report_page.dart';
 import '../../features/food_scanner/presentation/pages/food_scanner_page.dart';
 import '../../features/food_history/presentation/pages/food_history_page.dart';
 import '../../features/planner/presentation/pages/daily_meal_planner_page.dart';
+import '../../features/progress/presentation/pages/progress_page.dart';
+import '../../features/exercise/presentation/pages/exercise_history_page.dart';
+import '../../features/weight/presentation/pages/weight_history_page.dart';
 import 'route_names.dart';
 
 class AppRoutes {
@@ -68,6 +71,15 @@ class AppRoutes {
 
       case RouteNames.scanHealthReport:
         return MaterialPageRoute(builder: (_) => const ScanHealthReportPage());
+
+      case RouteNames.progress:
+        return MaterialPageRoute(builder: (_) => const ProgressPage());
+
+      case RouteNames.exercise:
+        return MaterialPageRoute(builder: (_) => const ExerciseHistoryPage());
+
+      case RouteNames.weightHistory:
+        return MaterialPageRoute(builder: (_) => const WeightHistoryPage());
 
       default:
         return MaterialPageRoute(

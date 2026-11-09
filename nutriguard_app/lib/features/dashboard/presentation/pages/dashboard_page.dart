@@ -130,9 +130,21 @@ class _DashboardPageState extends State<DashboardPage> {
       return;
     }
 
-    // Index 1 = Scanner
+    // Index 1 = Food Scanner
     if (index == 1) {
       _openScanner();
+      return;
+    }
+
+    // Index 2 = Meal Planner
+    if (index == 2) {
+      Navigator.pushNamed(context, RouteNames.planner);
+      return;
+    }
+
+    // Index 3 = Progress
+    if (index == 3) {
+      Navigator.pushNamed(context, RouteNames.progress);
       return;
     }
 
@@ -141,21 +153,6 @@ class _DashboardPageState extends State<DashboardPage> {
       Navigator.pushNamed(context, RouteNames.profile);
       return;
     }
-
-    if (index == 2) {
-      Navigator.pushNamed(context, RouteNames.planner);
-      return;
-    }
-
-    // Other pages are not implemented yet.
-    const pages = ['Home', 'Scanner', 'Planner', 'Progress', 'Profile'];
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${pages[index]} page is coming soon.'),
-        duration: const Duration(seconds: 2),
-      ),
-    );
   }
 
   Future<void> _confirmLogout() async {
