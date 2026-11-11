@@ -4,7 +4,22 @@ import '../../data/models/exercise_log_model.dart';
 import '../../data/repositories/exercise_log_repository.dart';
 
 class AddExercisePage extends StatefulWidget {
-  const AddExercisePage({super.key});
+  final String? initialExerciseName;
+  final String? initialExerciseType;
+  final int? initialDurationMinutes;
+  final bool? initialIsCompleted;
+
+  final DateTime? initialDate;
+
+  const AddExercisePage({
+    super.key,
+    this.initialExerciseName,
+    this.initialExerciseType,
+    this.initialDurationMinutes,
+    this.initialIsCompleted,
+
+    this.initialDate,
+  });
 
   @override
   State<AddExercisePage> createState() => _AddExercisePageState();
@@ -16,7 +31,7 @@ class _AddExercisePageState extends State<AddExercisePage> {
   final _nameController = TextEditingController();
   final _durationController = TextEditingController();
 
-  final ExerciseLogRepository _repository = ExerciseLogRepository();
+  late final ExerciseLogRepository _repository = ExerciseLogRepository();
 
   static const _exerciseTypes = [
     'Cardio',
@@ -31,6 +46,36 @@ class _AddExercisePageState extends State<AddExercisePage> {
   bool _isSaving = false;
 
   DateTime _selectedDate = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.initialDate != null) {
+      _selectedDate = widget.initialDate!;
+    }
+
+    // Automatically populate values when this page
+
+    // Automatically populate values when this page
+    // is opened from an exercise recommendation.
+    _nameController.text = widget.initialExerciseName ?? '';
+
+    if (widget.initialDurationMinutes != null) {
+      _durationController.text = widget.initialDurationMinutes.toString();
+    }
+
+    final initialType = widget.initialExerciseType;
+
+    if (initialType != null && _exerciseTypes.contains(initialType)) {
+      _selectedType = initialType;
+    }
+
+    // Preserve the previous default for manual logging.
+    // Recommended sessions start as planned, not completed.
+    _isCompleted =
+        widget.initialIsCompleted ?? (widget.initialExerciseName == null);
+  }
 
   @override
   void dispose() {
@@ -91,8 +136,8 @@ class _AddExercisePageState extends State<AddExercisePage> {
         exerciseType: _selectedType,
         durationMinutes: int.parse(_durationController.text.trim()),
         isCompleted: _isCompleted,
-        // For planned exercises, this represents the
-        // scheduled date rather than actual completion.
+        // For planned exercises, this is the
+        // scheduled date rather than completion time.
         performedAt: selectedDay,
       );
 
@@ -101,7 +146,7 @@ class _AddExercisePageState extends State<AddExercisePage> {
       if (!mounted) return;
 
       Navigator.pop(context, true);
-    } catch (error) {
+    } catch (_) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -148,12 +193,15 @@ class _AddExercisePageState extends State<AddExercisePage> {
                     color: Color(0xFF086F67),
                   ),
                 ),
+
                 const SizedBox(height: 8),
+
                 const Text(
                   'Record an activity you completed '
                   'or plan an upcoming exercise.',
                   style: TextStyle(color: Colors.grey),
                 ),
+
                 const SizedBox(height: 24),
 
                 TextFormField(
@@ -169,12 +217,15 @@ class _AddExercisePageState extends State<AddExercisePage> {
                     if (value == null || value.trim().isEmpty) {
                       return 'Enter an exercise name.';
                     }
+
                     return null;
                   },
                 ),
+
                 const SizedBox(height: 16),
 
                 DropdownButtonFormField<String>(
+                  key: ValueKey(_selectedType),
                   initialValue: _selectedType,
                   decoration: const InputDecoration(
                     labelText: 'Exercise Type',
@@ -184,14 +235,17 @@ class _AddExercisePageState extends State<AddExercisePage> {
                   items: _exerciseTypes.map((type) {
                     return DropdownMenuItem(value: type, child: Text(type));
                   }).toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _selectedType = value;
-                      });
-                    }
-                  },
+                  onChanged: _isSaving
+                      ? null
+                      : (value) {
+                          if (value != null) {
+                            setState(() {
+                              _selectedType = value;
+                            });
+                          }
+                        },
                 ),
+
                 const SizedBox(height: 16),
 
                 TextFormField(
@@ -211,12 +265,14 @@ class _AddExercisePageState extends State<AddExercisePage> {
                     }
 
                     if (minutes < 0 || minutes > 1440) {
-                      return 'Duration must be between 0 and 1440.';
+                      return 'Duration must be between '
+                          '0 and 1440.';
                     }
 
                     return null;
                   },
                 ),
+
                 const SizedBox(height: 16),
 
                 OutlinedButton.icon(
@@ -228,6 +284,7 @@ class _AddExercisePageState extends State<AddExercisePage> {
                     alignment: Alignment.centerLeft,
                   ),
                 ),
+
                 const SizedBox(height: 16),
 
                 SwitchListTile(
@@ -247,6 +304,7 @@ class _AddExercisePageState extends State<AddExercisePage> {
                           });
                         },
                 ),
+
                 const SizedBox(height: 24),
 
                 SizedBox(
@@ -267,6 +325,7 @@ class _AddExercisePageState extends State<AddExercisePage> {
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 16),
 
                 const Text(

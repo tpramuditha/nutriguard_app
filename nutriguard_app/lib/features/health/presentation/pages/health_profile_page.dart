@@ -569,6 +569,80 @@ class _HealthProfilePageState extends State<HealthProfilePage> {
 
             const SizedBox(height: 22),
 
+            Card(
+              color: Colors.white,
+              elevation: 1,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 24,
+                          backgroundColor: Color(0xFFE0F4ED),
+                          child: Icon(
+                            Icons.fitness_center,
+                            color: Color(0xFF086F67),
+                            size: 25,
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Exercise Plan',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF086F67),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Explore exercise recommendations based on '
+                      'your fitness goals, activity level, and '
+                      'exercise preferences.',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.black54,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            RouteNames.exerciseRecommendation,
+                          );
+                        },
+                        icon: const Icon(Icons.arrow_forward),
+                        label: const Text('View Exercise Recommendations'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF086F67),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 22),
+
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(

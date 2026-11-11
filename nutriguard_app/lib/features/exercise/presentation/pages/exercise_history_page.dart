@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../data/models/exercise_log_model.dart';
 import '../../data/repositories/exercise_log_repository.dart';
+import '../../../exercise_recommendation/data/models/exercise_recommendation_model.dart';
+import '../../../exercise_recommendation/domain/models/exercise_session_arguments.dart';
 import 'add_exercise_page.dart';
 
 class ExerciseHistoryPage extends StatefulWidget {
@@ -20,6 +22,46 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
   void initState() {
     super.initState();
     _loadExercises();
+  }
+
+  bool _openedRecommendedExercise = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_openedRecommendedExercise) {
+      return;
+    }
+
+    final arguments = ModalRoute.of(context)?.settings.arguments;
+
+    ExerciseRecommendationModel? recommendation;
+    DateTime? plannedDate;
+
+    if (arguments is ExerciseSessionArguments) {
+      recommendation = arguments.recommendation;
+      plannedDate = arguments.plannedDate;
+    } else if (arguments is ExerciseRecommendationModel) {
+      // Preserve previous route argument support.
+      recommendation = arguments;
+    } else {
+      return;
+    }
+
+    _openedRecommendedExercise = true;
+
+    final selectedRecommendation = recommendation;
+    final selectedDate = plannedDate;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      _openAddExercise(
+        recommendation: selectedRecommendation,
+        initialDate: selectedDate,
+      );
+    });
   }
 
   void _loadExercises() {
@@ -54,10 +96,21 @@ class _ExerciseHistoryPageState extends State<ExerciseHistoryPage> {
     );
   }
 
-  Future<void> _openAddExercise() async {
+  Future<void> _openAddExercise({
+    ExerciseRecommendationModel? recommendation,
+    DateTime? initialDate,
+  }) async {
     final saved = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => const AddExercisePage()),
+      MaterialPageRoute(
+        builder: (_) => AddExercisePage(
+          initialExerciseName: recommendation?.name,
+          initialExerciseType: recommendation?.type,
+          initialDurationMinutes: recommendation?.durationMinutes,
+          initialIsCompleted: recommendation == null ? null : false,
+          initialDate: initialDate,
+        ),
+      ),
     );
 
     if (!mounted) return;

@@ -17,6 +17,7 @@ import '../../features/planner/presentation/pages/daily_meal_planner_page.dart';
 import '../../features/progress/presentation/pages/progress_page.dart';
 import '../../features/exercise/presentation/pages/exercise_history_page.dart';
 import '../../features/weight/presentation/pages/weight_history_page.dart';
+import '../../features/exercise_recommendation/presentation/pages/exercise_recommendation_page.dart';
 import 'route_names.dart';
 
 class AppRoutes {
@@ -76,10 +77,18 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const ProgressPage());
 
       case RouteNames.exercise:
-        return MaterialPageRoute(builder: (_) => const ExerciseHistoryPage());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const ExerciseHistoryPage(),
+        );
 
       case RouteNames.weightHistory:
         return MaterialPageRoute(builder: (_) => const WeightHistoryPage());
+
+      case RouteNames.exerciseRecommendation:
+        return MaterialPageRoute(
+          builder: (_) => const ExerciseRecommendationPage(),
+        );
 
       default:
         return MaterialPageRoute(

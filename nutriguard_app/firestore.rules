@@ -618,6 +618,128 @@ function uniqueMarkerNames(items) {
       allow delete: if isWeightOwner();
     }
 
+    
+    
+    // NutriGuard Weekly Exercise Plans
+    match /users/{userId}/weeklyExercisePlans/{weekId} {
+
+      function isWeeklyPlanOwner() {
+        return request.auth != null
+          && request.auth.uid == userId;
+      }
+
+      function validExerciseId(id, level) {
+        return id is string
+          && id in [
+            'walking',
+            'gentle_stretching',
+            'chair_exercises',
+            'easy_cycling',
+            'brisk_walking',
+            'bodyweight_exercises',
+            'moderate_cycling',
+            'mobility_routine'
+          ]
+          && (
+            level != 'beginner'
+            || id in [
+              'walking',
+              'gentle_stretching',
+              'chair_exercises',
+              'easy_cycling',
+              'mobility_routine'
+            ]
+          );
+      }
+
+      function validPlanDay(day, expectedWeekday, level) {
+        return day is map
+          && day.keys().hasAll([
+            'weekday',
+            'exerciseId'
+          ])
+          && day.keys().hasOnly([
+            'weekday',
+            'exerciseId'
+          ])
+          && day.weekday == expectedWeekday
+          && (
+            expectedWeekday == 7
+              ? day.exerciseId == null
+              : validExerciseId(day.exerciseId, level)
+          );
+      }
+
+      function validPlanDays(days, level) {
+        return days is list
+          && days.size() == 7
+          && validPlanDay(days[0], 1, level)
+          && validPlanDay(days[1], 2, level)
+          && validPlanDay(days[2], 3, level)
+          && validPlanDay(days[3], 4, level)
+          && validPlanDay(days[4], 5, level)
+          && validPlanDay(days[5], 6, level)
+          && validPlanDay(days[6], 7, level);
+      }
+
+      function validWeeklyPlan() {
+        let data = request.resource.data;
+
+        return data.keys().hasAll([
+            'weekStart',
+            'goal',
+            'activityLevel',
+            'preference',
+            'days'
+          ])
+          && data.keys().hasOnly([
+            'weekStart',
+            'goal',
+            'activityLevel',
+            'preference',
+            'days'
+          ])
+
+          && weekId.matches(
+            '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+          )
+          && data.weekStart == weekId
+
+          && data.goal in [
+            'generalFitness',
+            'buildConsistency',
+            'improveEndurance',
+            'buildStrength'
+          ]
+
+          && data.activityLevel in [
+            'beginner',
+            'intermediate'
+          ]
+
+          && data.preference in [
+            'any',
+            'cardio',
+            'strength',
+            'flexibility'
+          ]
+
+          && validPlanDays(
+            data.days,
+            data.activityLevel
+          );
+      }
+
+      allow read: if isWeeklyPlanOwner();
+
+      allow create, update: if isWeeklyPlanOwner()
+        && validWeeklyPlan();
+
+      allow delete: if isWeeklyPlanOwner();
+    }
+
+
+
 
 
   }
