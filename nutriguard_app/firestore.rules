@@ -89,7 +89,7 @@ service cloud.firestore {
       allow delete: if isOwner();
     }
 
-    
+
     // NutriGuard monthly health markers
     match /users/{userId}/monthlyHealthMarkers/{monthId} {
 
@@ -98,7 +98,7 @@ service cloud.firestore {
           && request.auth.uid == userId;
       }
 
-      
+
 function validMarkerMeasurement(m) {
   return m is map
     && m.keys().hasAll(['name', 'value', 'unit'])
@@ -125,7 +125,7 @@ function validMarkerMeasurement(m) {
 }
 
 
-      
+
       // Check whether a particular measurement name exists.
       function hasMarker(items, name) {
         return (items.size() > 0 && items[0].name == name)
@@ -138,7 +138,7 @@ function validMarkerMeasurement(m) {
       }
 
       // A measurement name must not appear twice.
-      
+
 
 function uniqueMarkerNames(items) {
   let names = [
@@ -163,7 +163,7 @@ function uniqueMarkerNames(items) {
       }
 
 
-      
+
       function validMarkerMeasurements(items) {
         return items is list
           && items.size() > 0
@@ -199,7 +199,7 @@ function uniqueMarkerNames(items) {
       allow delete: if isMarkerOwner();
     }
 
-    
+
     // NutriGuard food logs
     match /users/{userId}/foodLogs/{foodLogId} {
 
@@ -309,11 +309,12 @@ function uniqueMarkerNames(items) {
       allow delete: if isFoodLogOwner();
     }
 
-    
+
     // NutriGuard nutrition goals
+
     match /users/{userId}/preferences/{preferenceId} {
 
-      function isNutritionGoalOwner() {
+      function isPreferenceOwner() {
         return request.auth != null
           && request.auth.uid == userId;
       }
@@ -340,19 +341,93 @@ function uniqueMarkerNames(items) {
           ];
       }
 
-      // Only the nutrition preferences document is accessible.
-      allow read: if preferenceId == 'nutrition'
-        && isNutritionGoalOwner();
+      function validProfilePreferences() {
+        let data = request.resource.data;
 
-      allow create, update: if preferenceId == 'nutrition'
-        && isNutritionGoalOwner()
-        && validNutritionGoal();
+        return data.keys().hasAll([
+            'dietaryRestrictions',
+            'allergies',
+            'unitSystem'
+          ])
+          && data.keys().hasOnly([
+            'dietaryRestrictions',
+            'allergies',
+            'unitSystem'
+          ])
+          && data.dietaryRestrictions is list
+          && data.dietaryRestrictions.size() >= 1
+          && data.dietaryRestrictions.size() <= 5
+          && data.dietaryRestrictions.hasOnly([
+            'Vegetarian',
+            'Vegan',
+            'Halal',
+            'Pescatarian',
+            'None'
+          ])
+          && (
+            !('None' in data.dietaryRestrictions)
+            || data.dietaryRestrictions.size() == 1
+          )
+          && data.allergies is list
+          && data.allergies.size() <= 30
+          && data.unitSystem is string
+          && data.unitSystem in [
+            'Metric',
+            'Imperial'
+          ];
+      }
 
-      // Nutrition goals cannot be deleted from the client.
+      function validNotificationPreferences() {
+        let data = request.resource.data;
+
+        return data.keys().hasAll([
+            'mealReminders',
+            'monthlyHealthMarkerReminders',
+            'aiSuggestionAlerts'
+          ])
+          && data.keys().hasOnly([
+            'mealReminders',
+            'monthlyHealthMarkerReminders',
+            'aiSuggestionAlerts'
+          ])
+          && data.mealReminders is bool
+          && data.monthlyHealthMarkerReminders is bool
+          && data.aiSuggestionAlerts is bool;
+      }
+
+      // Owners can read their own preference documents.
+      allow read: if isPreferenceOwner()
+        && preferenceId in [
+          'nutrition',
+          'profile',
+          'notifications'
+        ];
+
+      // Validate each preference document separately.
+      allow create, update: if isPreferenceOwner()
+        && (
+          (
+            preferenceId == 'nutrition'
+            && validNutritionGoal()
+          )
+          ||
+          (
+            preferenceId == 'profile'
+            && validProfilePreferences()
+          )
+          ||
+          (
+            preferenceId == 'notifications'
+            && validNotificationPreferences()
+          )
+        );
+
+      // Preference documents cannot be deleted from the client.
       allow delete: if false;
     }
 
-    
+
+
     // NutriGuard My Pantry
     match /users/{userId}/pantryItems/{itemId} {
 
@@ -361,7 +436,7 @@ function uniqueMarkerNames(items) {
           && request.auth.uid == userId;
       }
 
-      
+
       function validPantryItem() {
         let data = request.resource.data;
 
@@ -444,7 +519,7 @@ function uniqueMarkerNames(items) {
       allow delete: if isPantryOwner();
     }
 
-    
+
     // NutriGuard Meal Planner
     match /users/{userId}/plannedMeals/{mealId} {
 
@@ -500,7 +575,7 @@ function uniqueMarkerNames(items) {
       allow delete: if isMealOwner();
     }
 
-    
+
     // NutriGuard Exercise Logs
     match /users/{userId}/exerciseLogs/{exerciseId} {
 
@@ -568,7 +643,7 @@ function uniqueMarkerNames(items) {
       allow delete: if isExerciseOwner();
     }
 
-    
+
     // NutriGuard Weight Tracking
     match /users/{userId}/weightLogs/{weightLogId} {
 
@@ -618,8 +693,6 @@ function uniqueMarkerNames(items) {
       allow delete: if isWeightOwner();
     }
 
-    
-    
     // NutriGuard Weekly Exercise Plans
     match /users/{userId}/weeklyExercisePlans/{weekId} {
 

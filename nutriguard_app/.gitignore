@@ -60,3 +60,5 @@ firestore_export/
 # Local environment files
 .env
 .env.*
+# Node.js dependencies
+node_modules/
