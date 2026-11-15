@@ -1,11 +1,28 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import 'change_password_dialog.dart';
+import '../pages/my_stored_data_page.dart';
 
 class AccountSettingsCard extends StatelessWidget {
   final VoidCallback onLogout;
 
   const AccountSettingsCard({super.key, required this.onLogout});
+
+  Future<void> _showChangePasswordDialog(BuildContext context) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (_) => const ChangePasswordDialog(),
+    );
+
+    if (!context.mounted) return;
+
+    if (result == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password changed successfully.')),
+      );
+    }
+  }
 
   void _showComingSoon(BuildContext context, String feature) {
     ScaffoldMessenger.of(context)
@@ -45,33 +62,30 @@ class AccountSettingsCard extends StatelessWidget {
               ),
             ],
           ),
-
           const SizedBox(height: 12),
-
           _settingsItem(
             context,
             title: 'Change Password',
-            onTap: () => _showComingSoon(context, 'Change Password'),
+            onTap: () => _showChangePasswordDialog(context),
           ),
-
           const Divider(height: 1),
-
           _settingsItem(
             context,
             title: 'Privacy & Data',
-            onTap: () => _showComingSoon(context, 'Privacy & Data'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const MyStoredDataPage()),
+              );
+            },
           ),
-
           const Divider(height: 1),
-
           _settingsItem(
             context,
             title: 'Help & Support',
             onTap: () => _showComingSoon(context, 'Help & Support'),
           ),
-
           const Divider(height: 1),
-
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.logout_rounded, color: Colors.red),

@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 
-class AllergiesCard extends StatefulWidget {
-  const AllergiesCard({super.key});
+class AllergiesCard extends StatelessWidget {
+  final List<String> allergies;
+  final Future<void> Function(List<String>) onChanged;
+  final bool enabled;
 
-  @override
-  State<AllergiesCard> createState() => _AllergiesCardState();
-}
+  const AllergiesCard({
+    super.key,
+    required this.allergies,
+    required this.onChanged,
+    this.enabled = true,
+  });
 
-class _AllergiesCardState extends State<AllergiesCard> {
-  // Sample allergies for UI development
-  final List<String> _allergies = ['Peanuts', 'Shellfish'];
+  Future<void> _addAllergy(BuildContext context) async {
+    if (!enabled) return;
 
-  Future<void> _addAllergy() async {
     String allergyName = '';
 
     final newAllergy = await showDialog<String>(
@@ -21,7 +24,6 @@ class _AllergiesCardState extends State<AllergiesCard> {
       builder: (dialogContext) {
         return AlertDialog(
           title: const Text('Add Food Allergy'),
-
           content: TextFormField(
             autofocus: true,
             textCapitalization: TextCapitalization.words,
@@ -33,7 +35,6 @@ class _AllergiesCardState extends State<AllergiesCard> {
               allergyName = value;
             },
           ),
-
           actions: [
             TextButton(
               onPressed: () {
@@ -41,14 +42,11 @@ class _AllergiesCardState extends State<AllergiesCard> {
               },
               child: const Text('Cancel'),
             ),
-
             ElevatedButton(
               onPressed: () {
                 final name = allergyName.trim();
 
-                if (name.isEmpty) {
-                  return;
-                }
+                if (name.isEmpty) return;
 
                 Navigator.pop(dialogContext, name);
               },
@@ -59,11 +57,14 @@ class _AllergiesCardState extends State<AllergiesCard> {
       },
     );
 
-    if (!mounted || newAllergy == null) return;
+    if (!context.mounted || newAllergy == null) return;
 
-    // Prevent duplicate allergies
-    final alreadyExists = _allergies.any(
-      (allergy) => allergy.toLowerCase() == newAllergy.toLowerCase(),
+    final name = newAllergy.trim();
+
+    if (name.isEmpty) return;
+
+    final alreadyExists = allergies.any(
+      (allergy) => allergy.toLowerCase() == name.toLowerCase(),
     );
 
     if (alreadyExists) {
@@ -73,15 +74,22 @@ class _AllergiesCardState extends State<AllergiesCard> {
       return;
     }
 
-    setState(() {
-      _allergies.add(newAllergy);
-    });
+    if (allergies.length >= 30) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You can add up to 30 allergies.')),
+      );
+      return;
+    }
+
+    await onChanged([...allergies, name]);
   }
 
-  void _removeAllergy(String allergy) {
-    setState(() {
-      _allergies.remove(allergy);
-    });
+  Future<void> _removeAllergy(String allergy) async {
+    if (!enabled) return;
+
+    final updatedAllergies = List<String>.from(allergies)..remove(allergy);
+
+    await onChanged(updatedAllergies);
   }
 
   @override
@@ -100,7 +108,6 @@ class _AllergiesCardState extends State<AllergiesCard> {
           ),
         ],
       ),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -125,7 +132,7 @@ class _AllergiesCardState extends State<AllergiesCard> {
 
           const SizedBox(height: 18),
 
-          if (_allergies.isEmpty)
+          if (allergies.isEmpty)
             const Padding(
               padding: EdgeInsets.only(bottom: 12),
               child: Text(
@@ -137,13 +144,11 @@ class _AllergiesCardState extends State<AllergiesCard> {
           Wrap(
             spacing: 10,
             runSpacing: 10,
-            children: _allergies.map((allergy) {
+            children: allergies.map((allergy) {
               return Chip(
                 label: Text(allergy),
                 deleteIcon: const Icon(Icons.close, size: 18),
-                onDeleted: () {
-                  _removeAllergy(allergy);
-                },
+                onDeleted: enabled ? () => _removeAllergy(allergy) : null,
                 backgroundColor: const Color(0xFFFFF2E8),
                 deleteIconColor: const Color(0xFFE65100),
                 labelStyle: const TextStyle(
@@ -161,7 +166,7 @@ class _AllergiesCardState extends State<AllergiesCard> {
           const SizedBox(height: 12),
 
           TextButton.icon(
-            onPressed: _addAllergy,
+            onPressed: enabled ? () => _addAllergy(context) : null,
             icon: const Icon(Icons.add),
             label: const Text('Add Allergy'),
             style: TextButton.styleFrom(

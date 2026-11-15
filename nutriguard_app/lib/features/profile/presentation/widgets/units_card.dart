@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 
-class UnitsCard extends StatefulWidget {
-  const UnitsCard({super.key});
+class UnitsCard extends StatelessWidget {
+  final String selectedUnit;
+  final ValueChanged<String> onChanged;
+  final bool enabled;
 
-  @override
-  State<UnitsCard> createState() => _UnitsCardState();
-}
-
-class _UnitsCardState extends State<UnitsCard> {
-  // Temporary UI preference
-  String _selectedUnit = 'Metric';
+  const UnitsCard({
+    super.key,
+    required this.selectedUnit,
+    required this.onChanged,
+    this.enabled = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -54,9 +55,7 @@ class _UnitsCardState extends State<UnitsCard> {
               Expanded(
                 child: _unitButton(title: 'Metric (kg/g)', value: 'Metric'),
               ),
-
               const SizedBox(width: 8),
-
               Expanded(
                 child: _unitButton(
                   title: 'Imperial (lb/oz)',
@@ -71,14 +70,10 @@ class _UnitsCardState extends State<UnitsCard> {
   }
 
   Widget _unitButton({required String title, required String value}) {
-    final isSelected = _selectedUnit == value;
+    final isSelected = selectedUnit == value;
 
     return OutlinedButton(
-      onPressed: () {
-        setState(() {
-          _selectedUnit = value;
-        });
-      },
+      onPressed: enabled && !isSelected ? () => onChanged(value) : null,
       style: OutlinedButton.styleFrom(
         backgroundColor: isSelected ? AppColors.primary : Colors.white,
         foregroundColor: isSelected ? Colors.white : AppColors.primaryDark,

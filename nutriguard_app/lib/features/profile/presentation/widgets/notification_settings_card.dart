@@ -2,19 +2,21 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 
-class NotificationSettingsCard extends StatefulWidget {
-  const NotificationSettingsCard({super.key});
+class NotificationSettingsCard extends StatelessWidget {
+  final bool mealReminders;
+  final bool monthlyHealthMarkerReminders;
+  final bool aiSuggestionAlerts;
+  final Future<void> Function(String setting, bool value) onChanged;
+  final bool enabled;
 
-  @override
-  State<NotificationSettingsCard> createState() =>
-      _NotificationSettingsCardState();
-}
-
-class _NotificationSettingsCardState extends State<NotificationSettingsCard> {
-  // Temporary UI settings
-  bool _mealReminders = true;
-  bool _healthReminders = true;
-  bool _aiSuggestionAlerts = false;
+  const NotificationSettingsCard({
+    super.key,
+    required this.mealReminders,
+    required this.monthlyHealthMarkerReminders,
+    required this.aiSuggestionAlerts,
+    required this.onChanged,
+    this.enabled = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,6 @@ class _NotificationSettingsCardState extends State<NotificationSettingsCard> {
           ),
         ],
       ),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -57,41 +58,26 @@ class _NotificationSettingsCardState extends State<NotificationSettingsCard> {
 
           const SizedBox(height: 14),
 
-          // Meal logging reminders
           _notificationSwitch(
             title: 'Meal Logging Reminders',
-            value: _mealReminders,
-            onChanged: (value) {
-              setState(() {
-                _mealReminders = value;
-              });
-            },
+            value: mealReminders,
+            setting: 'mealReminders',
           ),
 
           const Divider(),
 
-          // Monthly health marker reminder
           _notificationSwitch(
             title: 'Monthly Health Marker Reminder',
-            value: _healthReminders,
-            onChanged: (value) {
-              setState(() {
-                _healthReminders = value;
-              });
-            },
+            value: monthlyHealthMarkerReminders,
+            setting: 'monthlyHealthMarkerReminders',
           ),
 
           const Divider(),
 
-          // AI suggestion alerts
           _notificationSwitch(
             title: 'AI Suggestion Alerts',
-            value: _aiSuggestionAlerts,
-            onChanged: (value) {
-              setState(() {
-                _aiSuggestionAlerts = value;
-              });
-            },
+            value: aiSuggestionAlerts,
+            setting: 'aiSuggestionAlerts',
           ),
         ],
       ),
@@ -101,7 +87,7 @@ class _NotificationSettingsCardState extends State<NotificationSettingsCard> {
   Widget _notificationSwitch({
     required String title,
     required bool value,
-    required ValueChanged<bool> onChanged,
+    required String setting,
   }) {
     return Row(
       children: [
@@ -111,10 +97,11 @@ class _NotificationSettingsCardState extends State<NotificationSettingsCard> {
             style: const TextStyle(fontSize: 13, color: AppColors.textPrimary),
           ),
         ),
-
         Switch(
           value: value,
-          onChanged: onChanged,
+          onChanged: enabled
+              ? (newValue) => onChanged(setting, newValue)
+              : null,
           activeThumbColor: Colors.white,
           activeTrackColor: AppColors.primary,
         ),

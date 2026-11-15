@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 
 class ProfileHeader extends StatelessWidget {
-  const ProfileHeader({super.key});
+  final VoidCallback onEditProfile;
+
+  const ProfileHeader({super.key, required this.onEditProfile});
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +35,7 @@ class ProfileHeader extends StatelessWidget {
             backgroundColor: Colors.white,
             child: Icon(Icons.person, color: AppColors.primary, size: 38),
           ),
-
           const SizedBox(width: 16),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,9 +50,7 @@ class ProfileHeader extends StatelessWidget {
                     color: AppColors.primaryDark,
                   ),
                 ),
-
                 const SizedBox(height: 5),
-
                 Text(
                   memberSince,
                   style: const TextStyle(
@@ -60,17 +58,9 @@ class ProfileHeader extends StatelessWidget {
                     fontSize: 12,
                   ),
                 ),
-
                 const SizedBox(height: 12),
-
                 OutlinedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Edit Profile will be added later.'),
-                      ),
-                    );
-                  },
+                  onPressed: onEditProfile,
                   icon: const Icon(Icons.edit_outlined, size: 16),
                   label: const Text('Edit Profile'),
                   style: OutlinedButton.styleFrom(

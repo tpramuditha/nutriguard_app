@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 
-class DietaryRestrictionsCard extends StatefulWidget {
-  const DietaryRestrictionsCard({super.key});
+class DietaryRestrictionsCard extends StatelessWidget {
+  final Set<String> selectedRestrictions;
+  final ValueChanged<Set<String>> onChanged;
+  final bool enabled;
 
-  @override
-  State<DietaryRestrictionsCard> createState() =>
-      _DietaryRestrictionsCardState();
-}
+  const DietaryRestrictionsCard({
+    super.key,
+    required this.selectedRestrictions,
+    required this.onChanged,
+    this.enabled = true,
+  });
 
-class _DietaryRestrictionsCardState extends State<DietaryRestrictionsCard> {
-  // Temporary selections for UI development
-  final Set<String> _selectedRestrictions = {'Halal'};
-
-  final List<String> _restrictions = [
+  static const List<String> _restrictions = [
     'Vegetarian',
     'Vegan',
     'Halal',
@@ -23,26 +23,29 @@ class _DietaryRestrictionsCardState extends State<DietaryRestrictionsCard> {
   ];
 
   void _toggleRestriction(String restriction) {
-    setState(() {
-      if (restriction == 'None') {
-        _selectedRestrictions.clear();
-        _selectedRestrictions.add('None');
-        return;
-      }
+    if (!enabled) return;
 
-      // Remove None when selecting another restriction
-      _selectedRestrictions.remove('None');
+    final updatedRestrictions = Set<String>.from(selectedRestrictions);
 
-      if (_selectedRestrictions.contains(restriction)) {
-        _selectedRestrictions.remove(restriction);
+    if (restriction == 'None') {
+      updatedRestrictions
+        ..clear()
+        ..add('None');
+    } else {
+      updatedRestrictions.remove('None');
+
+      if (updatedRestrictions.contains(restriction)) {
+        updatedRestrictions.remove(restriction);
       } else {
-        _selectedRestrictions.add(restriction);
+        updatedRestrictions.add(restriction);
       }
 
-      if (_selectedRestrictions.isEmpty) {
-        _selectedRestrictions.add('None');
+      if (updatedRestrictions.isEmpty) {
+        updatedRestrictions.add('None');
       }
-    });
+    }
+
+    onChanged(updatedRestrictions);
   }
 
   @override
@@ -78,14 +81,12 @@ class _DietaryRestrictionsCardState extends State<DietaryRestrictionsCard> {
               ),
             ],
           ),
-
           const SizedBox(height: 18),
-
           Wrap(
             spacing: 10,
             runSpacing: 10,
             children: _restrictions.map((restriction) {
-              final isSelected = _selectedRestrictions.contains(restriction);
+              final isSelected = selectedRestrictions.contains(restriction);
 
               return FilterChip(
                 label: Text(restriction),
@@ -105,9 +106,9 @@ class _DietaryRestrictionsCardState extends State<DietaryRestrictionsCard> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
-                onSelected: (_) {
-                  _toggleRestriction(restriction);
-                },
+                onSelected: enabled
+                    ? (_) => _toggleRestriction(restriction)
+                    : null,
               );
             }).toList(),
           ),
