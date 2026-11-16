@@ -5,6 +5,7 @@ import 'dart:io';
 
 import '../../../food_scanner/data/models/food_log_model.dart';
 import '../../../food_scanner/data/services/food_log_photo_service.dart';
+import '../../../meals/presentation/pages/meal_recommendation_page.dart';
 
 import '../widgets/nutrition_budget_card.dart';
 
@@ -344,6 +345,33 @@ class NutritionAnalysisPage extends StatelessWidget {
 
           // Daily budget section
           NutritionBudgetCard(foodLog: foodLog),
+
+          const SizedBox(height: 20),
+
+          // Navigate to meal recommendations
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => const MealRecommendationPage(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.restaurant_menu),
+              label: const Text('Explore Meal Recommendations'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _teal,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+            ),
+          ),
 
           const SizedBox(height: 14),
 
