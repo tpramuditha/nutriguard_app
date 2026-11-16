@@ -9,6 +9,7 @@ import '../widgets/food_portion_sheet.dart';
 import '../../data/models/food_log_model.dart';
 import '../../data/repositories/food_log_repository.dart';
 import '../../data/services/food_log_photo_service.dart';
+import '../../../nutrition/presentation/pages/nutrition_analysis_page.dart';
 import 'manual_food_entry_page.dart';
 
 class FoodSearchPage extends StatefulWidget {
@@ -212,8 +213,22 @@ class _FoodSearchPageState extends State<FoodSearchPage> {
         );
       }
 
-      // When opened from AI recognition, return a successful save result.
-      if (widget.initialQuery != null) {
+      // When opened from AI recognition, show Nutrition Analysis
+      // after the food log and its photo have been saved.
+      if (widget.initialQuery?.trim().isNotEmpty == true) {
+        await Navigator.push<void>(
+          context,
+          MaterialPageRoute<void>(
+            builder: (_) => NutritionAnalysisPage(
+              foodLog: foodLog,
+              foodLogDocumentId: documentId,
+            ),
+          ),
+        );
+
+        if (!mounted) return;
+
+        // Return the successful save result to FoodPhotoPage.
         Navigator.pop(context, true);
         return;
       }
