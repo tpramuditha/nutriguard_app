@@ -320,7 +320,7 @@ class _DashboardPageState extends State<DashboardPage> {
             const SizedBox(height: 28),
 
             // Existing Quick Actions.
-            const QuickActions(),
+            QuickActions(onScanFood: _openScanner),
 
             const SizedBox(height: 24),
 

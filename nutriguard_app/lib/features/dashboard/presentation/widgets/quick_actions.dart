@@ -4,40 +4,43 @@ import '../../../../app/routes/route_names.dart';
 import '../../../pantry/presentation/pages/pantry_page.dart';
 
 class QuickActions extends StatelessWidget {
-  const QuickActions({super.key});
+  final Future<void> Function()? onScanFood;
+
+  const QuickActions({super.key, this.onScanFood});
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _action(
-          context,
-          'Scan Food',
-          Icons.camera_alt_outlined,
-          const Color(0xFFB4F3E5),
-          const Color(0xFF008E83),
+        Expanded(
+          child: _action(context, Icons.qr_code_scanner, 'Scan Food', () {
+            if (onScanFood != null) {
+              onScanFood!();
+            } else {
+              Navigator.pushNamed(context, RouteNames.foodScanner);
+            }
+          }),
         ),
-        _action(
-          context,
-          'Pantry',
-          Icons.shopping_basket_outlined,
-          const Color(0xFFC8F4C8),
-          const Color(0xFF159F52),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _action(context, Icons.kitchen, 'Pantry', () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const PantryPage()),
+            );
+          }),
         ),
-        _action(
-          context,
-          'Planner',
-          Icons.calendar_month_outlined,
-          const Color(0xFFD0E3FF),
-          const Color(0xFF237BD2),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _action(context, Icons.calendar_month, 'Planner', () {
+            Navigator.pushNamed(context, RouteNames.planner);
+          }),
         ),
-        _action(
-          context,
-          'Health',
-          Icons.favorite_outline,
-          const Color(0xFFFFD5E1),
-          const Color(0xFFE74770),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _action(context, Icons.favorite, 'Health', () {
+            Navigator.pushNamed(context, RouteNames.health);
+          }),
         ),
       ],
     );
@@ -45,51 +48,24 @@ class QuickActions extends StatelessWidget {
 
   Widget _action(
     BuildContext context,
-    String title,
     IconData icon,
-    Color background,
-    Color iconColor,
+    String title,
+    VoidCallback onTap,
   ) {
-    return Expanded(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () {
-          // Open My Pantry.
-          if (title == 'Pantry') {
-            Navigator.of(
-              context,
-            ).push(MaterialPageRoute<void>(builder: (_) => const PantryPage()));
-            return;
-          }
-
-          // Navigate to Health Profile.
-          if (title == 'Health') {
-            Navigator.pushNamed(context, RouteNames.health);
-            return;
-          }
-
-          // Other quick actions are not implemented yet.
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('$title page is coming soon')));
-        },
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Column(
           children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: background,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 30, color: iconColor),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-            ),
+            Icon(icon, size: 26),
+            const SizedBox(height: 8),
+            Text(title),
           ],
         ),
       ),
