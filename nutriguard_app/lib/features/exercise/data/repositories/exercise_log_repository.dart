@@ -33,8 +33,10 @@ class ExerciseLogRepository {
       throw ArgumentError('Exercise type cannot be empty.');
     }
 
-    if (exercise.durationMinutes < 0) {
-      throw ArgumentError('Exercise duration cannot be negative.');
+    if (exercise.durationMinutes < 0 || exercise.durationMinutes > 1440) {
+      throw ArgumentError(
+        'Exercise duration must be between 0 and 1440 minutes.',
+      );
     }
   }
 
