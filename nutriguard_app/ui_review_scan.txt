@@ -1,0 +1,2289 @@
+
+
+File       : lib\features\auth\presentation\pages\auth_gate.dart
+LineNumber : 30
+Line       :     return StreamBuilder<User?>(
+
+File       : lib\features\auth\presentation\pages\auth_gate.dart
+LineNumber : 41
+Line       :             body: Center(child: CircularProgressIndicator()),
+
+File       : lib\features\auth\presentation\pages\auth_gate.dart
+LineNumber : 51
+Line       :         return FutureBuilder<bool>(
+
+File       : lib\features\auth\presentation\pages\auth_gate.dart
+LineNumber : 57
+Line       :                 body: Center(child: CircularProgressIndicator()),
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 23
+Line       :   bool _isLoading = false;
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 37
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 38
+Line       :         const SnackBar(content: Text('Please enter your email and password.')),
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 44
+Line       :       _isLoading = true;
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 47
+Line       :     try {
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 58
+Line       :     } on FirebaseAuthException catch (e) {
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 86
+Line       :           .showSnackBar(SnackBar(content: Text(message)));
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 87
+Line       :     } catch (e) {
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 90
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 91
+Line       :         const SnackBar(
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 98
+Line       :           _isLoading = false;
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 143
+Line       :                       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 144
+Line       :                         const SnackBar(
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 158
+Line       :                     onPressed: _isLoading ? null : _login,
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 159
+Line       :                     child: _isLoading
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 163
+Line       :                             child: CircularProgressIndicator(
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 229
+Line       :         ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\auth\presentation\pages\login_page.dart
+LineNumber : 230
+Line       :           SnackBar(content: Text('$label sign-in is not connected yet.')),
+
+File       : lib\features\auth\presentation\pages\signup_page.dart
+LineNumber : 25
+Line       :   bool _isLoading = false;
+
+File       : lib\features\auth\presentation\pages\signup_page.dart
+LineNumber : 38
+Line       :         .showSnackBar(SnackBar(content: Text(message)));
+
+File       : lib\features\auth\presentation\pages\signup_page.dart
+LineNumber : 81
+Line       :       _isLoading = true;
+
+File       : lib\features\auth\presentation\pages\signup_page.dart
+LineNumber : 84
+Line       :     try {
+
+File       : lib\features\auth\presentation\pages\signup_page.dart
+LineNumber : 96
+Line       :     } on FirebaseAuthException catch (e) {
+
+File       : lib\features\auth\presentation\pages\signup_page.dart
+LineNumber : 119
+Line       :     } catch (e) {
+
+File       : lib\features\auth\presentation\pages\signup_page.dart
+LineNumber : 128
+Line       :           _isLoading = false;
+
+File       : lib\features\auth\presentation\pages\signup_page.dart
+LineNumber : 231
+Line       :                   onPressed: _isLoading ? null : _signup,
+
+File       : lib\features\auth\presentation\pages\signup_page.dart
+LineNumber : 232
+Line       :                   child: _isLoading
+
+File       : lib\features\auth\presentation\pages\signup_page.dart
+LineNumber : 236
+Line       :                           child: CircularProgressIndicator(
+
+File       : lib\features\dashboard\presentation\pages\dashboard_page.dart
+LineNumber : 102
+Line       :     try {
+
+File       : lib\features\dashboard\presentation\pages\dashboard_page.dart
+LineNumber : 112
+Line       :     } catch (e) {
+
+File       : lib\features\dashboard\presentation\pages\dashboard_page.dart
+LineNumber : 115
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\dashboard\presentation\pages\dashboard_page.dart
+LineNumber : 116
+Line       :         const SnackBar(content: Text('Logout failed. Please try again.')),
+
+File       : lib\features\dashboard\presentation\pages\dashboard_page.dart
+LineNumber : 211
+Line       :             FutureBuilder<List<FoodLogModel>>(
+
+File       : lib\features\dashboard\presentation\pages\dashboard_page.dart
+LineNumber : 217
+Line       :                     child: Center(child: CircularProgressIndicator()),
+
+File       : lib\features\dashboard\presentation\pages\dashboard_page.dart
+LineNumber : 264
+Line       :                     FutureBuilder<NutritionGoalModel>(
+
+File       : lib\features\dashboard\presentation\pages\dashboard_page.dart
+LineNumber : 272
+Line       :                               child: CircularProgressIndicator(),
+
+File       : lib\features\dashboard\presentation\widgets\calorie_progress_card.dart
+LineNumber : 72
+Line       :                     child: CircularProgressIndicator(
+
+File       : lib\features\dashboard\presentation\widgets\dashboard_header.dart
+LineNumber : 63
+Line       :             ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\dashboard\presentation\widgets\dashboard_header.dart
+LineNumber : 64
+Line       :               const SnackBar(
+
+File       : lib\features\dashboard\presentation\widgets\macro_chart.dart
+LineNumber : 135
+Line       :           child: LinearProgressIndicator(
+
+File       : lib\features\dashboard\presentation\widgets\today_meals_card.dart
+LineNumber : 83
+Line       :     return FutureBuilder<List<FoodLogModel>>(
+
+File       : lib\features\dashboard\presentation\widgets\today_meals_card.dart
+LineNumber : 89
+Line       :             child: Center(child: CircularProgressIndicator()),
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 46
+Line       :   bool _isSaving = false;
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 103
+Line       :     if (_isSaving) return;
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 120
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 121
+Line       :         const SnackBar(
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 129
+Line       :       _isSaving = true;
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 132
+Line       :     try {
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 149
+Line       :     } catch (_) {
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 152
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 153
+Line       :         const SnackBar(
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 160
+Line       :           _isSaving = false;
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 238
+Line       :                   onChanged: _isSaving
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 279
+Line       :                   onPressed: _isSaving ? null : _selectDate,
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 299
+Line       :                   onChanged: _isSaving
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 313
+Line       :                     onPressed: _isSaving ? null : _saveExercise,
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 314
+Line       :                     icon: _isSaving
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 318
+Line       :                             child: CircularProgressIndicator(strokeWidth: 2),
+
+File       : lib\features\exercise\presentation\pages\add_exercise_page.dart
+LineNumber : 321
+Line       :                     label: Text(_isSaving ? 'Saving...' : 'Save Exercise'),
+
+File       : lib\features\exercise\presentation\pages\exercise_history_page.dart
+LineNumber : 74
+Line       :     try {
+
+File       : lib\features\exercise\presentation\pages\exercise_history_page.dart
+LineNumber : 76
+Line       :     } catch (_) {
+
+File       : lib\features\exercise\presentation\pages\exercise_history_page.dart
+LineNumber : 77
+Line       :       // The FutureBuilder displays the error message.
+
+File       : lib\features\exercise\presentation\pages\exercise_history_page.dart
+LineNumber : 92
+Line       :     ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\exercise\presentation\pages\exercise_history_page.dart
+LineNumber : 93
+Line       :       const SnackBar(
+
+File       : lib\features\exercise\presentation\pages\exercise_history_page.dart
+LineNumber : 135
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\exercise\presentation\pages\exercise_history_page.dart
+LineNumber : 136
+Line       :         const SnackBar(
+
+File       : lib\features\exercise\presentation\pages\exercise_history_page.dart
+LineNumber : 143
+Line       :     try {
+
+File       : lib\features\exercise\presentation\pages\exercise_history_page.dart
+LineNumber : 147
+Line       :     } catch (_) {
+
+File       : lib\features\exercise\presentation\pages\exercise_history_page.dart
+LineNumber : 182
+Line       :     try {
+
+File       : lib\features\exercise\presentation\pages\exercise_history_page.dart
+LineNumber : 185
+Line       :     } catch (_) {
+
+File       : lib\features\exercise\presentation\pages\exercise_history_page.dart
+LineNumber : 278
+Line       :       body: FutureBuilder<List<ExerciseLogModel>>(
+
+File       : lib\features\exercise\presentation\pages\exercise_history_page.dart
+LineNumber : 282
+Line       :             return const Center(child: CircularProgressIndicator());
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 56
+Line       :   bool _isSavingPlan = false;
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 58
+Line       :   bool _isLoadingPlan = false;
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 68
+Line       :   bool _isLoadingExerciseProgress = false;
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 164
+Line       :     if (_isLoadingPlan) return;
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 177
+Line       :       _isLoadingPlan = true;
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 180
+Line       :     try {
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 206
+Line       :     } catch (_) {
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 209
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 210
+Line       :         const SnackBar(
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 220
+Line       :           _isLoadingPlan = false;
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 249
+Line       :     if (_isLoadingExerciseProgress) return;
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 254
+Line       :       _isLoadingExerciseProgress = true;
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 258
+Line       :     try {
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 269
+Line       :     } catch (_) {
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 281
+Line       :           _isLoadingExerciseProgress = false;
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 288
+Line       :     if (_isSavingPlan) return;
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 303
+Line       :       _isSavingPlan = true;
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 306
+Line       :     try {
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 311
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 312
+Line       :         const SnackBar(
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 316
+Line       :     } catch (_) {
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 319
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 320
+Line       :         const SnackBar(
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 330
+Line       :           _isSavingPlan = false;
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 652
+Line       :         if (_isLoadingExerciseProgress) const LinearProgressIndicator(),
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 686
+Line       :           onPressed: _isLoadingExerciseProgress ? null : _loadExerciseProgress,
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 700
+Line       :         if (_isLoadingPlan) ...[
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 701
+Line       :           const LinearProgressIndicator(color: Color(0xFF086F67)),
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 767
+Line       :               onPressed: _isSavingPlan ? null : _saveWeeklyPlan,
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 768
+Line       :               icon: _isSavingPlan
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 772
+Line       :                       child: CircularProgressIndicator(strokeWidth: 2),
+
+File       : lib\features\exercise_recommendation\presentation\pages\exercise_recommendation_page.dart
+LineNumber : 776
+Line       :                 _isSavingPlan ? 'Saving Weekly Plan...' : 'Save Weekly Plan',
+
+File       : lib\features\exercise_recommendation\presentation\widgets\exercise_swap_action.dart
+LineNumber : 32
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\exercise_recommendation\presentation\widgets\exercise_swap_action.dart
+LineNumber : 33
+Line       :         const SnackBar(content: Text('No alternative exercises available.')),
+
+File       : lib\features\exercise_recommendation\presentation\widgets\exercise_swap_action.dart
+LineNumber : 126
+Line       :     try {
+
+File       : lib\features\exercise_recommendation\presentation\widgets\exercise_swap_action.dart
+LineNumber : 136
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\exercise_recommendation\presentation\widgets\exercise_swap_action.dart
+LineNumber : 137
+Line       :         SnackBar(content: Text('Exercise changed to ${selected.name}.')),
+
+File       : lib\features\exercise_recommendation\presentation\widgets\exercise_swap_action.dart
+LineNumber : 139
+Line       :     } catch (_) {
+
+File       : lib\features\exercise_recommendation\presentation\widgets\exercise_swap_action.dart
+LineNumber : 140
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\exercise_recommendation\presentation\widgets\exercise_swap_action.dart
+LineNumber : 141
+Line       :         const SnackBar(
+
+File       : lib\features\food_history\presentation\pages\food_history_page.dart
+LineNumber : 47
+Line       :     try {
+
+File       : lib\features\food_history\presentation\pages\food_history_page.dart
+LineNumber : 49
+Line       :     } catch (_) {
+
+File       : lib\features\food_history\presentation\pages\food_history_page.dart
+LineNumber : 50
+Line       :       // FutureBuilder displays the error message.
+
+File       : lib\features\food_history\presentation\pages\food_history_page.dart
+LineNumber : 435
+Line       :       body: FutureBuilder<List<FoodLogRecord>>(
+
+File       : lib\features\food_history\presentation\pages\food_history_page.dart
+LineNumber : 439
+Line       :             return const Center(child: CircularProgressIndicator());
+
+File       : lib\features\food_scanner\data\services\food_log_photo_service.dart
+LineNumber : 111
+Line       :     try {
+
+File       : lib\features\food_scanner\data\services\food_recognition_service.dart
+LineNumber : 27
+Line       :     try {
+
+File       : lib\features\food_scanner\presentation\pages\food_confirmation_page.dart
+LineNumber : 61
+Line       :         ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_confirmation_page.dart
+LineNumber : 62
+Line       :           const SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_confirmation_page.dart
+LineNumber : 73
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_confirmation_page.dart
+LineNumber : 74
+Line       :         const SnackBar(content: Text('Select at least one food.')),
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 36
+Line       :     try {
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 50
+Line       :     } catch (error) {
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 53
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 54
+Line       :         const SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 73
+Line       :     final retry = await showDialog<bool>(
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 104
+Line       :     return retry ?? false;
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 116
+Line       :     try {
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 122
+Line       :         ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 123
+Line       :           const SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 228
+Line       :           ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 229
+Line       :             SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 236
+Line       :         // in the list so they can retry or skip it.
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 242
+Line       :         ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 243
+Line       :           SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 252
+Line       :     } catch (error) {
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 255
+Line       :       final retry = await _showRecognitionError(
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 261
+Line       :       if (retry) {
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 367
+Line       :               const Center(child: CircularProgressIndicator()),
+
+File       : lib\features\food_scanner\presentation\pages\food_photo_page.dart
+LineNumber : 378
+Line       :                         child: CircularProgressIndicator(strokeWidth: 2),
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 128
+Line       :     try {
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 149
+Line       :         ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 150
+Line       :           const SnackBar(content: Text('Please log in to save your food.')),
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 182
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 183
+Line       :         SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 191
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 192
+Line       :         const SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 199
+Line       :     } catch (error) {
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 202
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 203
+Line       :         const SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 215
+Line       :     try {
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 217
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 218
+Line       :         const SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 228
+Line       :       ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 266
+Line       :           ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 267
+Line       :             const SnackBar(content: Text('Please log in to save your food.')),
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 289
+Line       :         try {
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 301
+Line       :           ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 302
+Line       :             SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 307
+Line       :         } catch (error) {
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 310
+Line       :           ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 311
+Line       :             const SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 317
+Line       :     } catch (error) {
+
+File       : lib\features\food_scanner\presentation\pages\food_scanner_page.dart
+LineNumber : 320
+Line       :       ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 34
+Line       :   bool _isSavingFood = false;
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 38
+Line       :   bool _isLoading = false;
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 40
+Line       :   String? _errorMessage;
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 70
+Line       :         _errorMessage = null;
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 78
+Line       :       _isLoading = true;
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 80
+Line       :       _errorMessage = null;
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 86
+Line       :     try {
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 95
+Line       :         _isLoading = false;
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 97
+Line       :     } catch (_) {
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 103
+Line       :         _isLoading = false;
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 104
+Line       :         _errorMessage =
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 118
+Line       :       _isLoading = false;
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 120
+Line       :       _errorMessage = null;
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 133
+Line       :     if (_isSavingFood) return;
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 146
+Line       :     if (!mounted || selection == null || _isSavingFood) {
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 153
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 154
+Line       :         const SnackBar(content: Text('Please log in to save your food.')),
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 160
+Line       :       _isSavingFood = true;
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 180
+Line       :     try {
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 189
+Line       :         try {
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 195
+Line       :         } catch (error) {
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 205
+Line       :         ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 206
+Line       :           const SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 237
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 238
+Line       :         SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 243
+Line       :     } catch (error) {
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 246
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 247
+Line       :         const SnackBar(content: Text('Unable to save food. Please try again.')),
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 252
+Line       :           _isSavingFood = false;
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 265
+Line       :         onTap: _isSavingFood ? null : () => _openPortionSheet(food),
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 377
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 378
+Line       :         const SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 387
+Line       :     if (_isLoading) {
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 388
+Line       :       return const Center(child: CircularProgressIndicator());
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 391
+Line       :     if (_errorMessage != null) {
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 402
+Line       :             Text(_errorMessage!, textAlign: TextAlign.center),
+
+File       : lib\features\food_scanner\presentation\pages\food_search_page.dart
+LineNumber : 477
+Line       :                 onPressed: _isLoading ? null : _searchFoods,
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 31
+Line       :   bool _isSaving = false;
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 192
+Line       :     if (_isSaving) return;
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 203
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 204
+Line       :         const SnackBar(content: Text('Please log in to save your food.')),
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 224
+Line       :       _isSaving = true;
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 228
+Line       :     try {
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 237
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 238
+Line       :         SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 247
+Line       :     } on StateError catch (_) {
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 250
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 251
+Line       :         const SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 259
+Line       :     } catch (error) {
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 262
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 263
+Line       :         const SnackBar(
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 273
+Line       :           _isSaving = false;
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 384
+Line       :             if (_hasAttemptedSave && !_isSaving) ...[
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 388
+Line       :                 'You can retry saving the same food details.',
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 428
+Line       :               onPressed: _isSaving ? null : _confirmEntry,
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 429
+Line       :               icon: _isSaving
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 433
+Line       :                       child: CircularProgressIndicator(strokeWidth: 2),
+
+File       : lib\features\food_scanner\presentation\pages\manual_food_entry_page.dart
+LineNumber : 436
+Line       :               label: Text(_isSaving ? 'Saving Food...' : 'Save Food'),
+
+File       : lib\features\food_scanner\presentation\widgets\recently_logged_foods.dart
+LineNumber : 118
+Line       :     return FutureBuilder<List<FoodLogModel>>(
+
+File       : lib\features\food_scanner\presentation\widgets\recently_logged_foods.dart
+LineNumber : 122
+Line       :           return const Center(child: CircularProgressIndicator());
+
+File       : lib\features\health\data\services\health_report_ocr_service.dart
+LineNumber : 7
+Line       :     try {
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 28
+Line       :   bool _isSaving = false;
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 77
+Line       :     if (_isSaving) return;
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 81
+Line       :         _isSaving = false;
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 85
+Line       :     try {
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 92
+Line       :     } catch (error) {
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 95
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 96
+Line       :         const SnackBar(
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 106
+Line       :           _isSaving = false;
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 113
+Line       :     if (_isSaving) return;
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 123
+Line       :         ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 124
+Line       :           const SnackBar(content: Text('Enter a custom report name.')),
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 141
+Line       :           ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 142
+Line       :             const SnackBar(
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 155
+Line       :           ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 156
+Line       :             SnackBar(content: Text('Enter a valid number for $name.')),
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 184
+Line       :           ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 185
+Line       :             SnackBar(content: Text('Enter a valid positive number for $name.')),
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 197
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 198
+Line       :         const SnackBar(content: Text('Enter at least one measurement.')),
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 204
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 205
+Line       :         const SnackBar(
+
+File       : lib\features\health\presentation\pages\add_health_report_page.dart
+LineNumber : 462
+Line       :               onPressed: _isSaving ? null : _validateAndConfirm,
+
+File       : lib\features\health\presentation\pages\confirm_detected_values_page.dart
+LineNumber : 102
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\confirm_detected_values_page.dart
+LineNumber : 103
+Line       :         const SnackBar(content: Text('Enter a value before confirming.')),
+
+File       : lib\features\health\presentation\pages\confirm_detected_values_page.dart
+LineNumber : 113
+Line       :         ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\confirm_detected_values_page.dart
+LineNumber : 114
+Line       :           const SnackBar(
+
+File       : lib\features\health\presentation\pages\confirm_detected_values_page.dart
+LineNumber : 132
+Line       :         ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\confirm_detected_values_page.dart
+LineNumber : 133
+Line       :           const SnackBar(
+
+File       : lib\features\health\presentation\pages\confirm_detected_values_page.dart
+LineNumber : 143
+Line       :         ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\confirm_detected_values_page.dart
+LineNumber : 144
+Line       :           SnackBar(content: Text('Enter a valid positive number for $title.')),
+
+File       : lib\features\health\presentation\pages\confirm_detected_values_page.dart
+LineNumber : 156
+Line       :     ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\confirm_detected_values_page.dart
+LineNumber : 157
+Line       :       const SnackBar(
+
+File       : lib\features\health\presentation\pages\health_profile_page.dart
+LineNumber : 151
+Line       :             FutureBuilder<MonthlyHealthMarkerModel?>(
+
+File       : lib\features\health\presentation\pages\health_profile_page.dart
+LineNumber : 253
+Line       :             FutureBuilder<MonthlyHealthMarkerModel?>(
+
+File       : lib\features\health\presentation\pages\health_profile_page.dart
+LineNumber : 259
+Line       :                     child: Center(child: CircularProgressIndicator()),
+
+File       : lib\features\health\presentation\pages\health_profile_page.dart
+LineNumber : 418
+Line       :             FutureBuilder(
+
+File       : lib\features\health\presentation\pages\health_profile_page.dart
+LineNumber : 425
+Line       :                       child: CircularProgressIndicator(),
+
+File       : lib\features\health\presentation\pages\health_report_history_page.dart
+LineNumber : 37
+Line       :     try {
+
+File       : lib\features\health\presentation\pages\health_report_history_page.dart
+LineNumber : 39
+Line       :     } catch (_) {
+
+File       : lib\features\health\presentation\pages\health_report_history_page.dart
+LineNumber : 40
+Line       :       // FutureBuilder displays the error state.
+
+File       : lib\features\health\presentation\pages\health_report_history_page.dart
+LineNumber : 55
+Line       :         child: FutureBuilder<List<HealthReportModel>>(
+
+File       : lib\features\health\presentation\pages\health_report_history_page.dart
+LineNumber : 59
+Line       :               return const Center(child: CircularProgressIndicator());
+
+File       : lib\features\health\presentation\pages\log_health_marker_page.dart
+LineNumber : 23
+Line       :   bool _isSaving = false;
+
+File       : lib\features\health\presentation\pages\log_health_marker_page.dart
+LineNumber : 65
+Line       :     if (_isSaving) return;
+
+File       : lib\features\health\presentation\pages\log_health_marker_page.dart
+LineNumber : 80
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\log_health_marker_page.dart
+LineNumber : 81
+Line       :         const SnackBar(content: Text('Enter at least one measurement.')),
+
+File       : lib\features\health\presentation\pages\log_health_marker_page.dart
+LineNumber : 87
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\log_health_marker_page.dart
+LineNumber : 88
+Line       :         const SnackBar(
+
+File       : lib\features\health\presentation\pages\log_health_marker_page.dart
+LineNumber : 142
+Line       :       _isSaving = true;
+
+File       : lib\features\health\presentation\pages\log_health_marker_page.dart
+LineNumber : 145
+Line       :     try {
+
+File       : lib\features\health\presentation\pages\log_health_marker_page.dart
+LineNumber : 151
+Line       :     } catch (error) {
+
+File       : lib\features\health\presentation\pages\log_health_marker_page.dart
+LineNumber : 156
+Line       :       ).showSnackBar(SnackBar(content: Text('Failed to save markers: $error')));
+
+File       : lib\features\health\presentation\pages\log_health_marker_page.dart
+LineNumber : 160
+Line       :           _isSaving = false;
+
+File       : lib\features\health\presentation\pages\log_health_marker_page.dart
+LineNumber : 396
+Line       :                 onPressed: _isSaving ? null : _saveMarkers,
+
+File       : lib\features\health\presentation\pages\log_health_marker_page.dart
+LineNumber : 397
+Line       :                 child: _isSaving
+
+File       : lib\features\health\presentation\pages\log_health_marker_page.dart
+LineNumber : 401
+Line       :                         child: CircularProgressIndicator(strokeWidth: 2),
+
+File       : lib\features\health\presentation\pages\scan_health_report_page.dart
+LineNumber : 41
+Line       :     try {
+
+File       : lib\features\health\presentation\pages\scan_health_report_page.dart
+LineNumber : 56
+Line       :     } catch (error) {
+
+File       : lib\features\health\presentation\pages\scan_health_report_page.dart
+LineNumber : 59
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\scan_health_report_page.dart
+LineNumber : 60
+Line       :         const SnackBar(
+
+File       : lib\features\health\presentation\pages\scan_health_report_page.dart
+LineNumber : 91
+Line       :     try {
+
+File       : lib\features\health\presentation\pages\scan_health_report_page.dart
+LineNumber : 104
+Line       :         ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\scan_health_report_page.dart
+LineNumber : 105
+Line       :           const SnackBar(
+
+File       : lib\features\health\presentation\pages\scan_health_report_page.dart
+LineNumber : 110
+Line       :     } catch (error) {
+
+File       : lib\features\health\presentation\pages\scan_health_report_page.dart
+LineNumber : 113
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\health\presentation\pages\scan_health_report_page.dart
+LineNumber : 114
+Line       :         const SnackBar(
+
+File       : lib\features\health\presentation\pages\scan_health_report_page.dart
+LineNumber : 309
+Line       :                           child: CircularProgressIndicator(strokeWidth: 2),
+
+File       : lib\features\meals\presentation\pages\meal_recommendation_page.dart
+LineNumber : 295
+Line       :           LinearProgressIndicator(
+
+File       : lib\features\meals\presentation\pages\meal_recommendation_page.dart
+LineNumber : 475
+Line       :   Widget _buildError(String message, {VoidCallback? retry}) {
+
+File       : lib\features\meals\presentation\pages\meal_recommendation_page.dart
+LineNumber : 485
+Line       :             if (retry != null) ...[
+
+File       : lib\features\meals\presentation\pages\meal_recommendation_page.dart
+LineNumber : 488
+Line       :                 onPressed: retry,
+
+File       : lib\features\meals\presentation\pages\meal_recommendation_page.dart
+LineNumber : 490
+Line       :                 label: const Text('Retry'),
+
+File       : lib\features\meals\presentation\pages\meal_recommendation_page.dart
+LineNumber : 532
+Line       :           : FutureBuilder<NutritionGoalModel>(
+
+File       : lib\features\meals\presentation\pages\meal_recommendation_page.dart
+LineNumber : 538
+Line       :                     retry: _refreshGoal,
+
+File       : lib\features\meals\presentation\pages\meal_recommendation_page.dart
+LineNumber : 543
+Line       :                   return const Center(child: CircularProgressIndicator());
+
+File       : lib\features\meals\presentation\pages\meal_recommendation_page.dart
+LineNumber : 546
+Line       :                 return StreamBuilder<List<PantryItemModel>>(
+
+File       : lib\features\meals\presentation\pages\meal_recommendation_page.dart
+LineNumber : 557
+Line       :                       return const Center(child: CircularProgressIndicator());
+
+File       : lib\features\meals\presentation\widgets\meal_card.dart
+LineNumber : 17
+Line       :         .showSnackBar(SnackBar(content: Text(message)));
+
+File       : lib\features\meals\presentation\widgets\more_meal_options.dart
+LineNumber : 185
+Line       :         .showSnackBar(SnackBar(content: Text(message)));
+
+File       : lib\features\nutrition\presentation\pages\nutrition_analysis_page.dart
+LineNumber : 99
+Line       :                   child: LinearProgressIndicator(
+
+File       : lib\features\nutrition\presentation\pages\nutrition_analysis_page.dart
+LineNumber : 124
+Line       :     return FutureBuilder<String?>(
+
+File       : lib\features\nutrition\presentation\widgets\nutrition_budget_card.dart
+LineNumber : 90
+Line       :     return FutureBuilder<_BudgetData>(
+
+File       : lib\features\nutrition\presentation\widgets\nutrition_budget_card.dart
+LineNumber : 96
+Line       :             child: Center(child: CircularProgressIndicator()),
+
+File       : lib\features\nutrition\presentation\widgets\nutrition_budget_card.dart
+LineNumber : 159
+Line       :                         child: CircularProgressIndicator(
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 29
+Line       :   bool _isSaving = false;
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 77
+Line       :     if (_isSaving) return;
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 86
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 87
+Line       :         const SnackBar(content: Text('Please log in to add ingredients.')),
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 104
+Line       :       _isSaving = true;
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 107
+Line       :     try {
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 123
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 124
+Line       :         const SnackBar(content: Text('Ingredient added successfully!')),
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 128
+Line       :     } catch (error) {
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 131
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 132
+Line       :         SnackBar(content: Text('Failed to save ingredient: $error')),
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 137
+Line       :           _isSaving = false;
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 182
+Line       :                 enabled: !_isSaving,
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 203
+Line       :                 enabled: !_isSaving,
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 238
+Line       :                 onChanged: _isSaving
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 264
+Line       :                 onChanged: _isSaving
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 280
+Line       :                 enabled: !_isSaving,
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 319
+Line       :                 onPressed: _isSaving ? null : _selectExpiryDate,
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 330
+Line       :                   onPressed: _isSaving
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 345
+Line       :                   onPressed: _isSaving ? null : _saveIngredient,
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 350
+Line       :                   icon: _isSaving
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 354
+Line       :                           child: CircularProgressIndicator(
+
+File       : lib\features\pantry\presentation\pages\add_pantry_item_page.dart
+LineNumber : 361
+Line       :                     _isSaving ? 'Saving...' : 'Save Ingredient',
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 31
+Line       :   bool _isSaving = false;
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 80
+Line       :     if (_isSaving) return;
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 99
+Line       :     if (_isSaving) return;
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 108
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 109
+Line       :         const SnackBar(content: Text('Please log in to update your pantry.')),
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 126
+Line       :       _isSaving = true;
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 129
+Line       :     try {
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 145
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 146
+Line       :         const SnackBar(content: Text('Ingredient updated successfully!')),
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 150
+Line       :     } catch (error) {
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 153
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 154
+Line       :         SnackBar(content: Text('Unable to update ingredient: $error')),
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 159
+Line       :           _isSaving = false;
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 217
+Line       :                 enabled: !_isSaving,
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 237
+Line       :                 enabled: !_isSaving,
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 272
+Line       :                 onChanged: _isSaving
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 298
+Line       :                 onChanged: _isSaving
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 314
+Line       :                 enabled: !_isSaving,
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 352
+Line       :                 onPressed: _isSaving ? null : _selectExpiryDate,
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 363
+Line       :                   onPressed: _isSaving
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 378
+Line       :                   onPressed: _isSaving ? null : _saveChanges,
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 383
+Line       :                   icon: _isSaving
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 387
+Line       :                           child: CircularProgressIndicator(
+
+File       : lib\features\pantry\presentation\pages\edit_pantry_item_page.dart
+LineNumber : 394
+Line       :                     _isSaving ? 'Saving...' : 'Save Changes',
+
+File       : lib\features\pantry\presentation\pages\pantry_page.dart
+LineNumber : 70
+Line       :     try {
+
+File       : lib\features\pantry\presentation\pages\pantry_page.dart
+LineNumber : 75
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\pantry\presentation\pages\pantry_page.dart
+LineNumber : 76
+Line       :         SnackBar(content: Text('${item.name} removed successfully')),
+
+File       : lib\features\pantry\presentation\pages\pantry_page.dart
+LineNumber : 78
+Line       :     } catch (error) {
+
+File       : lib\features\pantry\presentation\pages\pantry_page.dart
+LineNumber : 81
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\pantry\presentation\pages\pantry_page.dart
+LineNumber : 82
+Line       :         SnackBar(content: Text('Unable to delete ingredient: $error')),
+
+File       : lib\features\pantry\presentation\pages\pantry_page.dart
+LineNumber : 661
+Line       :           : StreamBuilder<List<PantryItemModel>>(
+
+File       : lib\features\pantry\presentation\pages\pantry_page.dart
+LineNumber : 678
+Line       :                     child: CircularProgressIndicator(color: primary),
+
+File       : lib\features\pantry\presentation\pages\recipes_page.dart
+LineNumber : 65
+Line       :   void _retryGoalLoading() {
+
+File       : lib\features\pantry\presentation\pages\recipes_page.dart
+LineNumber : 449
+Line       :             child: LinearProgressIndicator(
+
+File       : lib\features\pantry\presentation\pages\recipes_page.dart
+LineNumber : 602
+Line       :   Widget _buildError(String message, {VoidCallback? retry}) {
+
+File       : lib\features\pantry\presentation\pages\recipes_page.dart
+LineNumber : 612
+Line       :             if (retry != null) ...[
+
+File       : lib\features\pantry\presentation\pages\recipes_page.dart
+LineNumber : 615
+Line       :                 onPressed: retry,
+
+File       : lib\features\pantry\presentation\pages\recipes_page.dart
+LineNumber : 617
+Line       :                 label: const Text('Retry'),
+
+File       : lib\features\pantry\presentation\pages\recipes_page.dart
+LineNumber : 648
+Line       :               onPressed: _retryGoalLoading,
+
+File       : lib\features\pantry\presentation\pages\recipes_page.dart
+LineNumber : 657
+Line       :           : FutureBuilder<NutritionGoalModel>(
+
+File       : lib\features\pantry\presentation\pages\recipes_page.dart
+LineNumber : 664
+Line       :                     retry: _retryGoalLoading,
+
+File       : lib\features\pantry\presentation\pages\recipes_page.dart
+LineNumber : 670
+Line       :                     child: CircularProgressIndicator(color: primary),
+
+File       : lib\features\pantry\presentation\pages\recipes_page.dart
+LineNumber : 674
+Line       :                 return StreamBuilder<List<PantryItemModel>>(
+
+File       : lib\features\pantry\presentation\pages\recipes_page.dart
+LineNumber : 686
+Line       :                         child: CircularProgressIndicator(color: primary),
+
+File       : lib\features\pantry\presentation\widgets\recipe_health_context_card.dart
+LineNumber : 110
+Line       :           FutureBuilder<bool>(
+
+File       : lib\features\pantry\presentation\widgets\recipe_health_context_card.dart
+LineNumber : 121
+Line       :                         child: CircularProgressIndicator(
+
+File       : lib\features\planner\presentation\pages\daily_meal_planner_page.dart
+LineNumber : 43
+Line       :   bool _isSaving = false;
+
+File       : lib\features\planner\presentation\pages\daily_meal_planner_page.dart
+LineNumber : 113
+Line       :         .showSnackBar(SnackBar(content: Text(message)));
+
+File       : lib\features\planner\presentation\pages\daily_meal_planner_page.dart
+LineNumber : 299
+Line       :       _isSaving = true;
+
+File       : lib\features\planner\presentation\pages\daily_meal_planner_page.dart
+LineNumber : 302
+Line       :     try {
+
+File       : lib\features\planner\presentation\pages\daily_meal_planner_page.dart
+LineNumber : 322
+Line       :     } catch (error) {
+
+File       : lib\features\planner\presentation\pages\daily_meal_planner_page.dart
+LineNumber : 327
+Line       :           _isSaving = false;
+
+File       : lib\features\planner\presentation\pages\daily_meal_planner_page.dart
+LineNumber : 365
+Line       :       _isSaving = true;
+
+File       : lib\features\planner\presentation\pages\daily_meal_planner_page.dart
+LineNumber : 368
+Line       :     try {
+
+File       : lib\features\planner\presentation\pages\daily_meal_planner_page.dart
+LineNumber : 372
+Line       :     } catch (error) {
+
+File       : lib\features\planner\presentation\pages\daily_meal_planner_page.dart
+LineNumber : 377
+Line       :           _isSaving = false;
+
+File       : lib\features\planner\presentation\pages\daily_meal_planner_page.dart
+LineNumber : 525
+Line       :               onPressed: _isSaving
+
+File       : lib\features\planner\presentation\pages\daily_meal_planner_page.dart
+LineNumber : 532
+Line       :               onPressed: _isSaving ? null : () => _deleteMeal(meal),
+
+File       : lib\features\planner\presentation\pages\daily_meal_planner_page.dart
+LineNumber : 574
+Line       :               onPressed: _isSaving ? null : () => _showMealDialog(),
+
+File       : lib\features\planner\presentation\pages\daily_meal_planner_page.dart
+LineNumber : 609
+Line       :                   child: StreamBuilder<List<PlannedMealModel>>(
+
+File       : lib\features\planner\presentation\pages\daily_meal_planner_page.dart
+LineNumber : 622
+Line       :                         return const Center(child: CircularProgressIndicator());
+
+File       : lib\features\planner\presentation\pages\weekly_meal_planner_page.dart
+LineNumber : 143
+Line       :                   child: StreamBuilder<List<PlannedMealModel>>(
+
+File       : lib\features\planner\presentation\pages\weekly_meal_planner_page.dart
+LineNumber : 153
+Line       :                         return const Center(child: CircularProgressIndicator());
+
+File       : lib\features\profile\presentation\pages\my_stored_data_page.dart
+LineNumber : 45
+Line       :     try {
+
+File       : lib\features\profile\presentation\pages\my_stored_data_page.dart
+LineNumber : 51
+Line       :     } catch (e) {
+
+File       : lib\features\profile\presentation\pages\my_stored_data_page.dart
+LineNumber : 54
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\my_stored_data_page.dart
+LineNumber : 55
+Line       :         SnackBar(
+
+File       : lib\features\profile\presentation\pages\my_stored_data_page.dart
+LineNumber : 97
+Line       :       body: FutureBuilder<UserDataInventory>(
+
+File       : lib\features\profile\presentation\pages\my_stored_data_page.dart
+LineNumber : 102
+Line       :               child: CircularProgressIndicator(color: AppColors.primary),
+
+File       : lib\features\profile\presentation\pages\my_stored_data_page.dart
+LineNumber : 266
+Line       :                       child: CircularProgressIndicator(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 42
+Line       :   bool _isLoadingPreferences = true;
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 43
+Line       :   bool _isSavingPreferences = false;
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 58
+Line       :           _isLoadingPreferences = false;
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 64
+Line       :     try {
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 78
+Line       :     } catch (e) {
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 81
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 82
+Line       :         const SnackBar(content: Text('Unable to load profile preferences.')),
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 87
+Line       :           _isLoadingPreferences = false;
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 94
+Line       :     if (_isSavingPreferences) return;
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 99
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 100
+Line       :         const SnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 117
+Line       :       _isSavingPreferences = true;
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 120
+Line       :     try {
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 128
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 129
+Line       :         const SnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 133
+Line       :     } catch (e) {
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 140
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 141
+Line       :         const SnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 150
+Line       :           _isSavingPreferences = false;
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 157
+Line       :     if (_isSavingPreferences) return;
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 162
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 163
+Line       :         const SnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 180
+Line       :       _isSavingPreferences = true;
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 183
+Line       :     try {
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 191
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 192
+Line       :         const SnackBar(content: Text('Allergies saved successfully.')),
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 194
+Line       :     } catch (e) {
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 201
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 202
+Line       :         const SnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 209
+Line       :           _isSavingPreferences = false;
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 216
+Line       :     if (_isSavingPreferences) return;
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 221
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 222
+Line       :         const SnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 239
+Line       :       _isSavingPreferences = true;
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 242
+Line       :     try {
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 250
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 251
+Line       :         const SnackBar(content: Text('Units saved successfully.')),
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 253
+Line       :     } catch (e) {
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 260
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 261
+Line       :         const SnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 268
+Line       :           _isSavingPreferences = false;
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 275
+Line       :     if (_isSavingPreferences) return;
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 280
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 281
+Line       :         const SnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 304
+Line       :       _isSavingPreferences = true;
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 307
+Line       :     try {
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 315
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 316
+Line       :         const SnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 320
+Line       :     } catch (e) {
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 327
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 328
+Line       :         const SnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 337
+Line       :           _isSavingPreferences = false;
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 353
+Line       :     ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 354
+Line       :       const SnackBar(content: Text('Profile updated successfully.')),
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 372
+Line       :     try {
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 382
+Line       :     } catch (e) {
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 385
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 386
+Line       :         const SnackBar(content: Text('Logout failed. Please try again.')),
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 407
+Line       :     ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 408
+Line       :       SnackBar(content: Text('${pages[index]} page is coming soon.')),
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 450
+Line       :               enabled: !_isLoadingPreferences && !_isSavingPreferences,
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 458
+Line       :               enabled: !_isLoadingPreferences && !_isSavingPreferences,
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 469
+Line       :               enabled: !_isLoadingPreferences && !_isSavingPreferences,
+
+File       : lib\features\profile\presentation\pages\profile_page.dart
+LineNumber : 477
+Line       :               enabled: !_isLoadingPreferences && !_isSavingPreferences,
+
+File       : lib\features\profile\presentation\widgets\account_settings_card.dart
+LineNumber : 21
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\widgets\account_settings_card.dart
+LineNumber : 22
+Line       :         const SnackBar(content: Text('Password changed successfully.')),
+
+File       : lib\features\profile\presentation\widgets\account_settings_card.dart
+LineNumber : 29
+Line       :         .showSnackBar(SnackBar(content: Text('$feature will be added later.')));
+
+File       : lib\features\profile\presentation\widgets\allergies_card.dart
+LineNumber : 71
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\widgets\allergies_card.dart
+LineNumber : 72
+Line       :         const SnackBar(content: Text('This allergy is already added.')),
+
+File       : lib\features\profile\presentation\widgets\allergies_card.dart
+LineNumber : 78
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\widgets\allergies_card.dart
+LineNumber : 79
+Line       :         const SnackBar(content: Text('You can add up to 30 allergies.')),
+
+File       : lib\features\profile\presentation\widgets\change_password_dialog.dart
+LineNumber : 24
+Line       :   bool _isLoading = false;
+
+File       : lib\features\profile\presentation\widgets\change_password_dialog.dart
+LineNumber : 37
+Line       :     setState(() => _isLoading = true);
+
+File       : lib\features\profile\presentation\widgets\change_password_dialog.dart
+LineNumber : 39
+Line       :     try {
+
+File       : lib\features\profile\presentation\widgets\change_password_dialog.dart
+LineNumber : 47
+Line       :     } catch (e) {
+
+File       : lib\features\profile\presentation\widgets\change_password_dialog.dart
+LineNumber : 68
+Line       :           .showSnackBar(SnackBar(content: Text(message)));
+
+File       : lib\features\profile\presentation\widgets\change_password_dialog.dart
+LineNumber : 71
+Line       :         setState(() => _isLoading = false);
+
+File       : lib\features\profile\presentation\widgets\change_password_dialog.dart
+LineNumber : 110
+Line       :                 enabled: !_isLoading,
+
+File       : lib\features\profile\presentation\widgets\change_password_dialog.dart
+LineNumber : 131
+Line       :                 enabled: !_isLoading,
+
+File       : lib\features\profile\presentation\widgets\change_password_dialog.dart
+LineNumber : 155
+Line       :                 enabled: !_isLoading,
+
+File       : lib\features\profile\presentation\widgets\change_password_dialog.dart
+LineNumber : 178
+Line       :           onPressed: _isLoading ? null : () => Navigator.pop(context, false),
+
+File       : lib\features\profile\presentation\widgets\change_password_dialog.dart
+LineNumber : 182
+Line       :           onPressed: _isLoading ? null : _changePassword,
+
+File       : lib\features\profile\presentation\widgets\change_password_dialog.dart
+LineNumber : 183
+Line       :           child: _isLoading
+
+File       : lib\features\profile\presentation\widgets\change_password_dialog.dart
+LineNumber : 187
+Line       :                   child: CircularProgressIndicator(strokeWidth: 2),
+
+File       : lib\features\profile\presentation\widgets\edit_profile_dialog.dart
+LineNumber : 17
+Line       :   bool _isLoading = false;
+
+File       : lib\features\profile\presentation\widgets\edit_profile_dialog.dart
+LineNumber : 48
+Line       :     setState(() => _isLoading = true);
+
+File       : lib\features\profile\presentation\widgets\edit_profile_dialog.dart
+LineNumber : 50
+Line       :     try {
+
+File       : lib\features\profile\presentation\widgets\edit_profile_dialog.dart
+LineNumber : 57
+Line       :     } on FirebaseAuthException catch (e) {
+
+File       : lib\features\profile\presentation\widgets\edit_profile_dialog.dart
+LineNumber : 65
+Line       :         message = 'Please log in again and retry.';
+
+File       : lib\features\profile\presentation\widgets\edit_profile_dialog.dart
+LineNumber : 69
+Line       :           .showSnackBar(SnackBar(content: Text(message)));
+
+File       : lib\features\profile\presentation\widgets\edit_profile_dialog.dart
+LineNumber : 70
+Line       :     } catch (e) {
+
+File       : lib\features\profile\presentation\widgets\edit_profile_dialog.dart
+LineNumber : 73
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\widgets\edit_profile_dialog.dart
+LineNumber : 74
+Line       :         const SnackBar(
+
+File       : lib\features\profile\presentation\widgets\edit_profile_dialog.dart
+LineNumber : 80
+Line       :         setState(() => _isLoading = false);
+
+File       : lib\features\profile\presentation\widgets\edit_profile_dialog.dart
+LineNumber : 104
+Line       :               enabled: !_isLoading,
+
+File       : lib\features\profile\presentation\widgets\edit_profile_dialog.dart
+LineNumber : 135
+Line       :           onPressed: _isLoading ? null : () => Navigator.pop(context, false),
+
+File       : lib\features\profile\presentation\widgets\edit_profile_dialog.dart
+LineNumber : 139
+Line       :           onPressed: _isLoading ? null : _saveProfile,
+
+File       : lib\features\profile\presentation\widgets\edit_profile_dialog.dart
+LineNumber : 140
+Line       :           child: _isLoading
+
+File       : lib\features\profile\presentation\widgets\edit_profile_dialog.dart
+LineNumber : 144
+Line       :                   child: CircularProgressIndicator(strokeWidth: 2),
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 22
+Line       :   bool _isLoading = true;
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 23
+Line       :   bool _isSaving = false;
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 37
+Line       :           _isLoading = false;
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 43
+Line       :     try {
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 54
+Line       :     } catch (_) {
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 57
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 58
+Line       :         const SnackBar(content: Text('Unable to load nutrition goals.')),
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 63
+Line       :           _isLoading = false;
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 73
+Line       :     if (_isSaving) return;
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 78
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 79
+Line       :         const SnackBar(
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 87
+Line       :       _isSaving = true;
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 90
+Line       :     try {
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 106
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 107
+Line       :         const SnackBar(content: Text('Nutrition goals saved successfully!')),
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 109
+Line       :     } catch (_) {
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 112
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 113
+Line       :         const SnackBar(
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 120
+Line       :           _isSaving = false;
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 158
+Line       :                   ScaffoldMessenger.of(dialogContext).showSnackBar(
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 159
+Line       :                     const SnackBar(
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 187
+Line       :     if (_isLoading) {
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 191
+Line       :           child: CircularProgressIndicator(),
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 250
+Line       :                 onChanged: _isSaving
+
+File       : lib\features\profile\presentation\widgets\personal_goals_card.dart
+LineNumber : 279
+Line       :                 onPressed: _isSaving ? null : _editCalorieTarget,
+
+File       : lib\features\progress\presentation\pages\progress_page.dart
+LineNumber : 55
+Line       :     try {
+
+File       : lib\features\progress\presentation\pages\progress_page.dart
+LineNumber : 57
+Line       :     } catch (_) {
+
+File       : lib\features\progress\presentation\pages\progress_page.dart
+LineNumber : 58
+Line       :       // The FutureBuilder displays loading errors.
+
+File       : lib\features\progress\presentation\pages\progress_page.dart
+LineNumber : 227
+Line       :             LinearProgressIndicator(
+
+File       : lib\features\progress\presentation\pages\progress_page.dart
+LineNumber : 421
+Line       :                   LinearProgressIndicator(
+
+File       : lib\features\progress\presentation\pages\progress_page.dart
+LineNumber : 655
+Line       :           : FutureBuilder<ProgressDataSnapshot>(
+
+File       : lib\features\progress\presentation\pages\progress_page.dart
+LineNumber : 659
+Line       :                   return const Center(child: CircularProgressIndicator());
+
+File       : lib\features\progress\presentation\widgets\exercise_completion_section.dart
+LineNumber : 156
+Line       :               child: LinearProgressIndicator(
+
+File       : lib\features\progress\presentation\widgets\exercise_completion_section.dart
+LineNumber : 261
+Line       :         FutureBuilder<List<ExerciseLogModel>>(
+
+File       : lib\features\progress\presentation\widgets\exercise_completion_section.dart
+LineNumber : 267
+Line       :                 child: Center(child: CircularProgressIndicator()),
+
+File       : lib\features\progress\presentation\widgets\health_marker_trends_section.dart
+LineNumber : 148
+Line       :         FutureBuilder<List<MonthlyHealthMarkerModel>>(
+
+File       : lib\features\progress\presentation\widgets\health_marker_trends_section.dart
+LineNumber : 154
+Line       :                 child: Center(child: CircularProgressIndicator()),
+
+File       : lib\features\progress\presentation\widgets\weight_trend_section.dart
+LineNumber : 112
+Line       :         FutureBuilder<List<WeightLogModel>>(
+
+File       : lib\features\progress\presentation\widgets\weight_trend_section.dart
+LineNumber : 118
+Line       :                 child: Center(child: CircularProgressIndicator()),
+
+File       : lib\features\weight\presentation\pages\add_weight_page.dart
+LineNumber : 21
+Line       :   bool _isSaving = false;
+
+File       : lib\features\weight\presentation\pages\add_weight_page.dart
+LineNumber : 56
+Line       :     if (_isSaving) return;
+
+File       : lib\features\weight\presentation\pages\add_weight_page.dart
+LineNumber : 76
+Line       :       _isSaving = true;
+
+File       : lib\features\weight\presentation\pages\add_weight_page.dart
+LineNumber : 79
+Line       :     try {
+
+File       : lib\features\weight\presentation\pages\add_weight_page.dart
+LineNumber : 92
+Line       :     } catch (_) {
+
+File       : lib\features\weight\presentation\pages\add_weight_page.dart
+LineNumber : 95
+Line       :       ScaffoldMessenger.of(context).showSnackBar(
+
+File       : lib\features\weight\presentation\pages\add_weight_page.dart
+LineNumber : 96
+Line       :         const SnackBar(
+
+File       : lib\features\weight\presentation\pages\add_weight_page.dart
+LineNumber : 104
+Line       :           _isSaving = false;
+
+File       : lib\features\weight\presentation\pages\add_weight_page.dart
+LineNumber : 184
+Line       :                           enabled: !_isSaving,
+
+File       : lib\features\weight\presentation\pages\add_weight_page.dart
+LineNumber : 229
+Line       :                           onPressed: _isSaving ? null : _selectDate,
+
+File       : lib\features\weight\presentation\pages\add_weight_page.dart
+LineNumber : 248
+Line       :                     onPressed: _isSaving ? null : _saveWeight,
+
+File       : lib\features\weight\presentation\pages\add_weight_page.dart
+LineNumber : 249
+Line       :                     icon: _isSaving
+
+File       : lib\features\weight\presentation\pages\add_weight_page.dart
+LineNumber : 253
+Line       :                             child: CircularProgressIndicator(
+
+File       : lib\features\weight\presentation\pages\add_weight_page.dart
+LineNumber : 259
+Line       :                     label: Text(_isSaving ? 'Saving...' : 'Save Weight'),
+
+File       : lib\features\weight\presentation\pages\weight_history_page.dart
+LineNumber : 32
+Line       :     try {
+
+File       : lib\features\weight\presentation\pages\weight_history_page.dart
+LineNumber : 34
+Line       :     } catch (_) {
+
+File       : lib\features\weight\presentation\pages\weight_history_page.dart
+LineNumber : 35
+Line       :       // FutureBuilder handles loading errors.
+
+File       : lib\features\weight\presentation\pages\weight_history_page.dart
+LineNumber : 50
+Line       :         .showSnackBar(SnackBar(content: Text(message)));
+
+File       : lib\features\weight\presentation\pages\weight_history_page.dart
+LineNumber : 71
+Line       :     try {
+
+File       : lib\features\weight\presentation\pages\weight_history_page.dart
+LineNumber : 152
+Line       :     try {
+
+File       : lib\features\weight\presentation\pages\weight_history_page.dart
+LineNumber : 159
+Line       :     } catch (_) {
+
+File       : lib\features\weight\presentation\pages\weight_history_page.dart
+LineNumber : 195
+Line       :     try {
+
+File       : lib\features\weight\presentation\pages\weight_history_page.dart
+LineNumber : 202
+Line       :     } catch (_) {
+
+File       : lib\features\weight\presentation\pages\weight_history_page.dart
+LineNumber : 280
+Line       :       body: FutureBuilder<List<WeightLogModel>>(
+
+File       : lib\features\weight\presentation\pages\weight_history_page.dart
+LineNumber : 284
+Line       :             return const Center(child: CircularProgressIndicator());
+
+
+
+

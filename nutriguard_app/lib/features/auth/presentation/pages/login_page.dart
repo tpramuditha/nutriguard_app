@@ -8,7 +8,9 @@ import '../widgets/auth_text_field.dart';
 import '../../../../core/services/firebase/firebase_auth_service.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final FirebaseAuthService? authService;
+
+  const LoginPage({super.key, this.authService});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -18,9 +20,15 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final FirebaseAuthService _authService = FirebaseAuthService();
+  late final FirebaseAuthService _authService;
 
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _authService = widget.authService ?? FirebaseAuthService();
+  }
 
   @override
   void dispose() {
@@ -30,19 +38,18 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _login() async {
-    final email = _emailController.text.trim();
-    final password = _passwordController.text;
-
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your email and password.')),
-      );
+    if (!_formKey.currentState!.validate()) {
       return;
     }
+
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
 
     setState(() {
       _isLoading = true;
     });
+
+    // Keep the existing try-catch-finally block below unchanged.
 
     try {
       await _authService.signIn(email: email, password: password);
@@ -125,6 +132,18 @@ class _LoginPageState extends State<LoginPage> {
                   icon: Icons.mail_outline,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please enter your email address.';
+                    }
+
+                    if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+                        .hasMatch(value.trim())) {
+                      return 'Please enter a valid email address.';
+                    }
+
+                    return null;
+                  },
                 ),
 
                 const SizedBox(height: 16),
@@ -134,6 +153,13 @@ class _LoginPageState extends State<LoginPage> {
                   icon: Icons.lock_outline,
                   controller: _passwordController,
                   isPassword: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password.';
+                    }
+
+                    return null;
+                  },
                 ),
 
                 Align(

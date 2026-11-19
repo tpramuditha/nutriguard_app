@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 
 import 'package:nutriguard_app/app/routes/app_routes.dart';
 import 'package:nutriguard_app/app/routes/route_names.dart';
+import 'package:nutriguard_app/features/exercise/data/repositories/exercise_log_repository.dart';
 import 'package:nutriguard_app/features/exercise/presentation/pages/add_exercise_page.dart';
 import 'package:nutriguard_app/features/exercise_recommendation/data/models/exercise_recommendation_model.dart';
 import 'package:nutriguard_app/features/exercise_recommendation/domain/models/exercise_session_arguments.dart';
 import 'package:nutriguard_app/features/exercise_recommendation/domain/services/exercise_plan_date_service.dart';
 import 'package:nutriguard_app/features/exercise_recommendation/presentation/widgets/exercise_start_action.dart';
 
+class MockExerciseLogRepository extends Mock implements ExerciseLogRepository {}
+
 void main() {
+  late MockExerciseLogRepository repository;
+
+  setUp(() {
+    repository = MockExerciseLogRepository();
+  });
+
   const recommendation = ExerciseRecommendationModel(
     id: 'gentle_stretching',
     name: 'Gentle Stretching',
@@ -31,6 +41,7 @@ void main() {
             initialDurationMinutes: recommendation.durationMinutes,
             initialIsCompleted: false,
             initialDate: DateTime(2026, 11, 11),
+            repository: repository,
           ),
         ),
       );
@@ -44,7 +55,9 @@ void main() {
     });
 
     testWidgets('manual exercise uses current date', (tester) async {
-      await tester.pumpWidget(const MaterialApp(home: AddExercisePage()));
+      await tester.pumpWidget(
+        MaterialApp(home: AddExercisePage(repository: repository)),
+      );
 
       final today = DateTime.now();
 

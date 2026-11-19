@@ -175,6 +175,13 @@ void main() {
       );
     });
 
+    test('rejects duration above 1440 minutes', () async {
+      await expectLater(
+        repository.addExercise(createExercise(duration: 1441)),
+        throwsArgumentError,
+      );
+    });
+
     test('rejects empty exercise type', () async {
       await expectLater(
         repository.addExercise(createExercise(type: '')),

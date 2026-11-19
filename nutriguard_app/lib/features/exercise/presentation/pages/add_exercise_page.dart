@@ -10,6 +10,7 @@ class AddExercisePage extends StatefulWidget {
   final bool? initialIsCompleted;
 
   final DateTime? initialDate;
+  final ExerciseLogRepository? repository;
 
   const AddExercisePage({
     super.key,
@@ -19,6 +20,7 @@ class AddExercisePage extends StatefulWidget {
     this.initialIsCompleted,
 
     this.initialDate,
+    this.repository,
   });
 
   @override
@@ -31,7 +33,7 @@ class _AddExercisePageState extends State<AddExercisePage> {
   final _nameController = TextEditingController();
   final _durationController = TextEditingController();
 
-  late final ExerciseLogRepository _repository = ExerciseLogRepository();
+  late final ExerciseLogRepository _repository;
 
   static const _exerciseTypes = [
     'Cardio',
@@ -50,6 +52,8 @@ class _AddExercisePageState extends State<AddExercisePage> {
   @override
   void initState() {
     super.initState();
+
+    _repository = widget.repository ?? ExerciseLogRepository();
 
     if (widget.initialDate != null) {
       _selectedDate = widget.initialDate!;

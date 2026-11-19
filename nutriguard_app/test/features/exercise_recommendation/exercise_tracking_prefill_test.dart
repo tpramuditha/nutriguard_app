@@ -2,11 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:nutriguard_app/app/routes/route_names.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:nutriguard_app/features/exercise/data/repositories/exercise_log_repository.dart';
 import 'package:nutriguard_app/features/exercise/presentation/pages/add_exercise_page.dart';
 import 'package:nutriguard_app/features/exercise_recommendation/data/models/exercise_recommendation_model.dart';
 import 'package:nutriguard_app/features/exercise_recommendation/presentation/widgets/exercise_start_action.dart';
 
+class MockExerciseLogRepository extends Mock implements ExerciseLogRepository {}
+
 void main() {
+  late MockExerciseLogRepository repository;
+
+  setUp(() {
+    repository = MockExerciseLogRepository();
+  });
+
   const recommendation = ExerciseRecommendationModel(
     id: 'gentle_stretching',
     name: 'Gentle Stretching',
@@ -23,6 +33,7 @@ void main() {
     String? type,
     int? duration,
     bool? completed,
+    required ExerciseLogRepository repository,
   }) {
     return MaterialApp(
       home: AddExercisePage(
@@ -30,6 +41,7 @@ void main() {
         initialExerciseType: type,
         initialDurationMinutes: duration,
         initialIsCompleted: completed,
+        repository: repository,
       ),
     );
   }
@@ -44,7 +56,7 @@ void main() {
 
   group('Exercise Tracking Prefill', () {
     testWidgets('manual form starts with empty fields', (tester) async {
-      await tester.pumpWidget(buildForm());
+      await tester.pumpWidget(buildForm(repository: repository));
 
       expect(fieldValue(tester, 0), '');
       expect(fieldValue(tester, 1), '');
@@ -62,6 +74,7 @@ void main() {
           type: recommendation.type,
           duration: recommendation.durationMinutes,
           completed: false,
+          repository: repository,
         ),
       );
 
@@ -85,6 +98,7 @@ void main() {
           type: recommendation.type,
           duration: recommendation.durationMinutes,
           completed: false,
+          repository: repository,
         ),
       );
 
@@ -103,6 +117,7 @@ void main() {
           type: recommendation.type,
           duration: recommendation.durationMinutes,
           completed: false,
+          repository: repository,
         ),
       );
 

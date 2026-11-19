@@ -8,14 +8,17 @@ import '../../../../app/routes/route_names.dart';
 import '../../../nutrition/presentation/pages/nutrition_analysis_page.dart';
 
 class FoodHistoryPage extends StatefulWidget {
-  const FoodHistoryPage({super.key});
+  final FoodLogRepository? repository;
+  final String? userId;
+
+  const FoodHistoryPage({super.key, this.repository, this.userId});
 
   @override
   State<FoodHistoryPage> createState() => _FoodHistoryPageState();
 }
 
 class _FoodHistoryPageState extends State<FoodHistoryPage> {
-  final FoodLogRepository _repository = FoodLogRepository();
+  late final FoodLogRepository _repository;
 
   late Future<List<FoodLogRecord>> _logsFuture;
 
@@ -30,15 +33,18 @@ class _FoodHistoryPageState extends State<FoodHistoryPage> {
   @override
   void initState() {
     super.initState();
+
+    _repository = widget.repository ?? FoodLogRepository();
+
     _loadLogs();
   }
 
   void _loadLogs() {
-    final user = FirebaseAuth.instance.currentUser;
+    final userId = widget.userId ?? FirebaseAuth.instance.currentUser?.uid;
 
-    _logsFuture = user == null
+    _logsFuture = userId == null
         ? Future.error(StateError('Please log in to view food history.'))
-        : _repository.getFoodLogRecords(userId: user.uid);
+        : _repository.getFoodLogRecords(userId: userId);
   }
 
   Future<void> _refresh() async {
@@ -383,29 +389,37 @@ class _FoodHistoryPageState extends State<FoodHistoryPage> {
             padding: const EdgeInsets.symmetric(vertical: 45),
             child: Column(
               children: [
-                const Icon(
-                  Icons.no_meals_outlined,
+                Icon(
+                  dailyLogs.isEmpty
+                      ? Icons.no_meals_outlined
+                      : Icons.filter_list_off,
                   size: 55,
                   color: AppColors.primary,
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'No meals logged for this selection.',
+                Text(
+                  dailyLogs.isEmpty
+                      ? 'No meals logged for this date.'
+                      : 'No meals found for this meal type.',
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20),
 
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    await Navigator.pushNamed(context, RouteNames.foodScanner);
+                if (dailyLogs.isEmpty)
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      await Navigator.pushNamed(
+                        context,
+                        RouteNames.foodScanner,
+                      );
 
-                    if (!mounted) return;
+                      if (!mounted) return;
 
-                    await _refresh();
-                  },
-                  icon: const Icon(Icons.add),
-                  label: const Text('Log a Meal'),
-                ),
+                      await _refresh();
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text('Log a Meal'),
+                  ),
               ],
             ),
           )
@@ -441,16 +455,39 @@ class _FoodHistoryPageState extends State<FoodHistoryPage> {
 
           if (snapshot.hasError) {
             return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('Could not load food history.'),
-                  const SizedBox(height: 12),
-                  ElevatedButton(
-                    onPressed: _refresh,
-                    child: const Text('Try Again'),
-                  ),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.cloud_off_outlined,
+                      size: 55,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Unable to Load Food History',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Something went wrong while loading your food history. '
+                      'Please check your connection and try again.',
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      onPressed: _refresh,
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Try Again'),
+                    ),
+                  ],
+                ),
               ),
             );
           }

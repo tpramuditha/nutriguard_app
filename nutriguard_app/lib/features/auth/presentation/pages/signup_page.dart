@@ -8,7 +8,9 @@ import '../widgets/auth_header.dart';
 import '../widgets/auth_text_field.dart';
 
 class SignupPage extends StatefulWidget {
-  const SignupPage({super.key});
+  final FirebaseAuthService? authService;
+
+  const SignupPage({super.key, this.authService});
 
   @override
   State<SignupPage> createState() => _SignupPageState();
@@ -19,10 +21,16 @@ class _SignupPageState extends State<SignupPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final FirebaseAuthService _authService = FirebaseAuthService();
+  late final FirebaseAuthService _authService;
 
   bool _agreeToTerms = false;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _authService = widget.authService ?? FirebaseAuthService();
+  }
 
   @override
   void dispose() {
