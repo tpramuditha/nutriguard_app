@@ -7,8 +7,9 @@ import '../../data/repositories/monthly_health_marker_repository.dart';
 
 class LogHealthMarkerPage extends StatefulWidget {
   final DateTime? selectedMonth;
+  final MonthlyHealthMarkerRepository? repository;
 
-  const LogHealthMarkerPage({super.key, this.selectedMonth});
+  const LogHealthMarkerPage({super.key, this.selectedMonth, this.repository});
 
   @override
   State<LogHealthMarkerPage> createState() => _LogHealthMarkerPageState();
@@ -17,8 +18,7 @@ class LogHealthMarkerPage extends StatefulWidget {
 class _LogHealthMarkerPageState extends State<LogHealthMarkerPage> {
   final _formKey = GlobalKey<FormState>();
 
-  final MonthlyHealthMarkerRepository _markerRepository =
-      MonthlyHealthMarkerRepository();
+  late final MonthlyHealthMarkerRepository _markerRepository;
 
   bool _isSaving = false;
 
@@ -32,6 +32,12 @@ class _LogHealthMarkerPageState extends State<LogHealthMarkerPage> {
   final _glucoseController = TextEditingController();
   final _systolicController = TextEditingController();
   final _diastolicController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _markerRepository = widget.repository ?? MonthlyHealthMarkerRepository();
+  }
 
   @override
   void dispose() {
@@ -151,9 +157,13 @@ class _LogHealthMarkerPageState extends State<LogHealthMarkerPage> {
     } catch (error) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to save markers: $error')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Unable to save health markers. Check your connection and try again.',
+          ),
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() {

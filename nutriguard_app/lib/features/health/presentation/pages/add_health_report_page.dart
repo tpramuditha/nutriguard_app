@@ -8,7 +8,9 @@ import '../../data/models/health_report_model.dart';
 import '../../data/repositories/health_report_repository.dart';
 
 class AddHealthReportPage extends StatefulWidget {
-  const AddHealthReportPage({super.key});
+  final HealthReportRepository? repository;
+
+  const AddHealthReportPage({super.key, this.repository});
 
   @override
   State<AddHealthReportPage> createState() => _AddHealthReportPageState();
@@ -22,12 +24,18 @@ class _AddHealthReportPageState extends State<AddHealthReportPage> {
   List<Map<String, String>> _customMeasurements = [];
 
   // Repository used to communicate with Cloud Firestore.
-  final HealthReportRepository _reportRepository = HealthReportRepository();
+  late final HealthReportRepository _reportRepository;
 
   // Tracks whether a report is currently being saved.
   bool _isSaving = false;
 
   DateTime _reportDate = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    _reportRepository = widget.repository ?? HealthReportRepository();
+  }
 
   Future<void> _selectReportDate() async {
     final selectedDate = await showDatePicker(
@@ -78,7 +86,7 @@ class _AddHealthReportPageState extends State<AddHealthReportPage> {
 
     if (mounted) {
       setState(() {
-        _isSaving = false;
+        _isSaving = true;
       });
     }
 
@@ -460,8 +468,19 @@ class _AddHealthReportPageState extends State<AddHealthReportPage> {
 
             ElevatedButton.icon(
               onPressed: _isSaving ? null : _validateAndConfirm,
-              icon: const Icon(Icons.fact_check_outlined),
-              label: const Text('Review Report Details'),
+              icon: _isSaving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.fact_check_outlined),
+              label: Text(
+                _isSaving ? 'Saving Report...' : 'Review Report Details',
+              ),
             ),
 
             const SizedBox(height: 24),

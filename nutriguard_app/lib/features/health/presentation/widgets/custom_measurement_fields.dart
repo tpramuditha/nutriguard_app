@@ -47,6 +47,15 @@ class _CustomMeasurementFieldsState extends State<CustomMeasurementFields> {
   }
 
   void _addMeasurement() {
+    if (_measurements.length >= 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('A report can contain a maximum of 10 measurements.'),
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _measurements.add({'id': _nextId++, 'name': '', 'value': '', 'unit': ''});
     });
