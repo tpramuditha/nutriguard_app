@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/routes/route_names.dart';
 import '../../../pantry/presentation/pages/pantry_page.dart';
+import '../../../../app/theme/app_colors.dart';
 
 class QuickActions extends StatelessWidget {
   final Future<void> Function()? onScanFood;
@@ -63,9 +64,20 @@ class QuickActions extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Icon(icon, size: 26),
+            CircleAvatar(
+              radius: 21,
+              backgroundColor: AppColors.primaryLight,
+              child: Icon(icon, size: 24, color: AppColors.primary),
+            ),
             const SizedBox(height: 8),
-            Text(title),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textPrimary,
+              ),
+            ),
           ],
         ),
       ),

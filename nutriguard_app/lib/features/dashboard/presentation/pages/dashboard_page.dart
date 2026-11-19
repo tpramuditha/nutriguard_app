@@ -171,7 +171,7 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FAFC),
+      backgroundColor: AppColors.background,
 
       appBar: AppBar(
         title: const Text(
