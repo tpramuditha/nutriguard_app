@@ -148,7 +148,7 @@ class _RecentlyLoggedFoodsState extends State<RecentlyLoggedFoods> {
         }
 
         return SizedBox(
-          height: 170,
+          height: 190,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: foods.length,

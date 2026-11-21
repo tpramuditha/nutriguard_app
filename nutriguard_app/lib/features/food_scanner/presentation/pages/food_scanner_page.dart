@@ -495,7 +495,7 @@ class _FoodScannerPageState extends State<FoodScannerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FAFC),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'Log Food',
@@ -505,7 +505,7 @@ class _FoodScannerPageState extends State<FoodScannerPage> {
           ),
         ),
         centerTitle: true,
-        backgroundColor: const Color(0xFFF5FAFC),
+        backgroundColor: AppColors.background,
         actions: [
           TextButton.icon(
             onPressed: () {
