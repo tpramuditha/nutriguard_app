@@ -56,6 +56,8 @@ before(async () => {
   testEnv = await initializeTestEnvironment({
     projectId,
     firestore: {
+      host: "127.0.0.1",
+      port: 8080,
       rules: fs.readFileSync("firestore.rules", "utf8"),
     },
   });
