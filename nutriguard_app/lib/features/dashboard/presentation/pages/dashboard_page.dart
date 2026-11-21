@@ -181,7 +181,7 @@ class _DashboardPageState extends State<DashboardPage> {
             color: AppColors.primary,
           ),
         ),
-        backgroundColor: const Color(0xFFF5FAFC),
+        backgroundColor: AppColors.background,
 
         actions: [
           PopupMenuButton<String>(

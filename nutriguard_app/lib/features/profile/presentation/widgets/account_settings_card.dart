@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import 'change_password_dialog.dart';
 import '../pages/my_stored_data_page.dart';
+import '../../../../app/routes/route_names.dart';
 
 class AccountSettingsCard extends StatelessWidget {
   final VoidCallback onLogout;
@@ -22,11 +23,6 @@ class AccountSettingsCard extends StatelessWidget {
         const SnackBar(content: Text('Password changed successfully.')),
       );
     }
-  }
-
-  void _showComingSoon(BuildContext context, String feature) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text('$feature will be added later.')));
   }
 
   @override
@@ -83,7 +79,9 @@ class AccountSettingsCard extends StatelessWidget {
           _settingsItem(
             context,
             title: 'Help & Support',
-            onTap: () => _showComingSoon(context, 'Help & Support'),
+            onTap: () {
+              Navigator.pushNamed(context, RouteNames.helpSupport);
+            },
           ),
           const Divider(height: 1),
           ListTile(

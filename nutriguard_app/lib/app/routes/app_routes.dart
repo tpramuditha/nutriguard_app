@@ -18,6 +18,7 @@ import '../../features/progress/presentation/pages/progress_page.dart';
 import '../../features/exercise/presentation/pages/exercise_history_page.dart';
 import '../../features/weight/presentation/pages/weight_history_page.dart';
 import '../../features/exercise_recommendation/presentation/pages/exercise_recommendation_page.dart';
+import '../../features/profile/presentation/pages/help_support_page.dart';
 import 'route_names.dart';
 
 class AppRoutes {
@@ -51,6 +52,9 @@ class AppRoutes {
 
       case RouteNames.profile:
         return MaterialPageRoute(builder: (_) => const ProfilePage());
+
+      case RouteNames.helpSupport:
+        return MaterialPageRoute(builder: (_) => const HelpSupportPage());
 
       case RouteNames.health:
         return MaterialPageRoute(builder: (_) => const HealthProfilePage());

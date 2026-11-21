@@ -19,4 +19,5 @@ class RouteNames {
   static const String addHealthReport = '/add-health-report';
   static const String confirmDetectedValues = '/confirm-detected-values';
   static const String scanHealthReport = '/scan-health-report';
+  static const String helpSupport = '/help-support';
 }
