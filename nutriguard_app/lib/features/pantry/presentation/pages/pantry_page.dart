@@ -8,7 +8,10 @@ import 'edit_pantry_item_page.dart';
 import 'recipes_page.dart';
 
 class PantryPage extends StatefulWidget {
-  const PantryPage({super.key});
+  final PantryRepository? repository;
+  final FirebaseAuth? firebaseAuth;
+
+  const PantryPage({super.key, this.repository, this.firebaseAuth});
 
   @override
   State<PantryPage> createState() => _PantryPageState();
@@ -19,7 +22,10 @@ class _PantryPageState extends State<PantryPage> {
   static const Color darkGreen = Color(0xFF086F67);
   static const Color background = Color(0xFFF7FAFA);
 
-  final PantryRepository _repository = PantryRepository();
+  late final PantryRepository _repository =
+      widget.repository ?? PantryRepository();
+
+  FirebaseAuth get _auth => widget.firebaseAuth ?? FirebaseAuth.instance;
   final TextEditingController _searchController = TextEditingController();
 
   String _selectedFilter = 'All';
@@ -44,7 +50,7 @@ class _PantryPageState extends State<PantryPage> {
   }
 
   Future<void> _deleteItem(PantryItemModel item) async {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _auth.currentUser;
     if (user == null) return;
 
     final confirmed = await showDialog<bool>(
@@ -628,7 +634,7 @@ class _PantryPageState extends State<PantryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = _auth.currentUser;
 
     return Scaffold(
       backgroundColor: background,

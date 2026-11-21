@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../../app/routes/route_names.dart';
 import '../../../pantry/presentation/pages/pantry_page.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../pantry/data/repositories/pantry_repository.dart';
 
 class QuickActions extends StatelessWidget {
   final Future<void> Function()? onScanFood;
 
-  const QuickActions({super.key, this.onScanFood});
+  const QuickActions({
+    super.key,
+    this.onScanFood,
+    this.pantryRepository,
+    this.firebaseAuth,
+  });
+
+  final PantryRepository? pantryRepository;
+  final FirebaseAuth? firebaseAuth;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +37,12 @@ class QuickActions extends StatelessWidget {
           child: _action(context, Icons.kitchen, 'Pantry', () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const PantryPage()),
+              MaterialPageRoute(
+                builder: (_) => PantryPage(
+                  repository: pantryRepository,
+                  firebaseAuth: firebaseAuth,
+                ),
+              ),
             );
           }),
         ),
