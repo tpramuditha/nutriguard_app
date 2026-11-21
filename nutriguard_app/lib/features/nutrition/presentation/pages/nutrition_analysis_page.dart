@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'dart:io';
 
+import '../../../../app/theme/app_colors.dart';
 import '../../../food_scanner/data/models/food_log_model.dart';
 import '../../../food_scanner/data/services/food_log_photo_service.dart';
 import '../../../meals/presentation/pages/meal_recommendation_page.dart';
@@ -21,7 +22,7 @@ class NutritionAnalysisPage extends StatelessWidget {
 
   static const Color _teal = Color(0xFF009B8E);
   static const Color _dark = Color(0xFF073D58);
-  static const Color _background = Color(0xFFF4FAFC);
+  static const Color _background = AppColors.background;
 
   Widget _card({required Widget child}) {
     return Container(

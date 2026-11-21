@@ -505,9 +505,9 @@ class _MealRecommendationPageState extends State<MealRecommendationPage> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5FAFC),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5FAFC),
+        backgroundColor: AppColors.background,
         centerTitle: true,
         title: const Text(
           'Meal Recommendations',
