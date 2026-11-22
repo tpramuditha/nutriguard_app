@@ -21,19 +21,33 @@ class FoodModel {
     required this.fatPer100g,
   });
 
+  void _validateGrams(double grams) {
+    if (!grams.isFinite || grams < 0 || grams > 5000) {
+      throw ArgumentError.value(
+        grams,
+        'grams',
+        'Grams must be between 0 and 5000.',
+      );
+    }
+  }
+
   double caloriesForGrams(double grams) {
+    _validateGrams(grams);
     return caloriesPer100g * grams / 100;
   }
 
   double proteinForGrams(double grams) {
+    _validateGrams(grams);
     return proteinPer100g * grams / 100;
   }
 
   double carbsForGrams(double grams) {
+    _validateGrams(grams);
     return carbsPer100g * grams / 100;
   }
 
   double fatForGrams(double grams) {
+    _validateGrams(grams);
     return fatPer100g * grams / 100;
   }
 

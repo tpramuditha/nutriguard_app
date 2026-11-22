@@ -74,4 +74,37 @@ void main() {
     expect(restored.proteinPer100g, 2.7);
     expect(restored.fatPer100g, 0.3);
   });
+
+  test('calculates nutrition for a decimal gram portion', () {
+    expect(testFood.caloriesForGrams(125.5), closeTo(163.15, 0.001));
+    expect(testFood.proteinForGrams(125.5), closeTo(3.3885, 0.001));
+    expect(testFood.carbsForGrams(125.5), closeTo(35.391, 0.001));
+    expect(testFood.fatForGrams(125.5), closeTo(0.3765, 0.001));
+  });
+
+  test('returns zero nutrition for a zero gram portion', () {
+    expect(testFood.caloriesForGrams(0), 0);
+    expect(testFood.proteinForGrams(0), 0);
+    expect(testFood.carbsForGrams(0), 0);
+    expect(testFood.fatForGrams(0), 0);
+  });
+
+  test('rejects a negative gram portion', () {
+    expect(() => testFood.caloriesForGrams(-100), throwsArgumentError);
+    expect(() => testFood.proteinForGrams(-100), throwsArgumentError);
+    expect(() => testFood.carbsForGrams(-100), throwsArgumentError);
+    expect(() => testFood.fatForGrams(-100), throwsArgumentError);
+  });
+
+  test('rejects portions greater than 5000 grams', () {
+    expect(() => testFood.caloriesForGrams(5001), throwsArgumentError);
+  });
+
+  test('rejects NaN and infinite gram portions', () {
+    expect(() => testFood.caloriesForGrams(double.nan), throwsArgumentError);
+    expect(
+      () => testFood.caloriesForGrams(double.infinity),
+      throwsArgumentError,
+    );
+  });
 }
